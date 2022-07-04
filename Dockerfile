@@ -11,4 +11,4 @@ EXPOSE 3000
 
 # build and start
 RUN npm run build
-CMD serve -s build
+CMD npm run serve

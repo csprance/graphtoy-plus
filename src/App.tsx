@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import Header from './components/Header';
 import Graph from './components/Graph';
 import Gui from './components/Gui';

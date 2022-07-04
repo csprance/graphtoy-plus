@@ -106,13 +106,6 @@ a:hover {
   color: #ffffff;
 }
 
-.formulaSection {
-  width: 100%;
-  display: flex;
-  padding-bottom: 4px;
-  align-items: center;
-}
-
 .userInput {
   background-color: #202020;
   color: #ffffff;
@@ -208,3 +201,5 @@ a:hover {
     border-radius: 0px;
   }
 }
+
+

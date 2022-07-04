@@ -384,7 +384,8 @@ export default class Grapher {
     let fnFormula: any = null;
 
     try {
-      fnFormula = Function('x,t,a,b,c,d,e,f,g,h', str);
+      // eslint-disable-next-line no-new-func
+      fnFormula = Function('x,t,A,B,C,D,E,F,G,H', str);
     } catch (err) {
       return;
     }

@@ -149,6 +149,9 @@
         const b = (2.0 * cellnoise(i + 1) - 1.0) * (f - 1.0);
         return 2.0 * (a + (b - a) * w);
       }
+      function fit(val, omin, omax, nmin, nmax){
+        return remap(omin, omax, val, nmin, nmax)
+      }
     </script>
   </head>
   <body>

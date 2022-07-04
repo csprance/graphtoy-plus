@@ -285,15 +285,20 @@ export const useStore = create<State & Actions>()((set, getState) => ({
   variables: defaultVariables,
   setVariable: (index, partial) =>
     set((state) => ({
-      formulasValid: false,
-      variables: state.variables.map((v) => {
-        if (index === v.id) {
-          return {
-            ...v,
-            ...partial,
-          };
-        }
-        return v;
-      }),
+      variables: state.variables
+        .map((v) => {
+          if (index === v.id) {
+            return {
+              ...v,
+              ...partial,
+            };
+          }
+          return v;
+        })
+        .map((v) => ({
+          ...v,
+          // prevent Divide by zero
+          value: v.value === 0 ? v.value + Number.EPSILON : v.value,
+        })),
     })),
 }));

@@ -6,29 +6,29 @@ interface Props {
   formula: Formula;
 }
 const FormulaComponent: React.FC<Props> = ({ formula }) => {
+    const [enabled, setEnabled] = React.useState(true);
   const {
-    setFocusedFormula,
-    toggleFormulaVisibility,
     setFormulaValue,
     formulaColors,
+      grapher
   } = useStore();
 
   return (
     <div className="formulaSection">
       <div
         id={`f${formula.index}`}
-        onClick={() => toggleFormulaVisibility(formula.index)}
+        onClick={() => {
+            setEnabled(!enabled)
+            grapher?.toggleVisibility(formula.index)
+        }}
         style={{
-          color: formula.enabled ? formulaColors[formula.index - 1] : '#808080',
+          color: enabled ? formulaColors[formula.index - 1] : '#808080',
         }}
       >
         f<sub>{formula.index}</sub>(x,t) = &nbsp;
       </div>
       <input
         type="text"
-        onFocus={() => {
-          setFocusedFormula(formula.index);
-        }}
         autoCorrect="off"
         autoCapitalize="none"
         className="userInput"

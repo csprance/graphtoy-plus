@@ -24,11 +24,10 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>GraphToy</title>
     <script>
-
       function stepNaN(a, x) {
-        return Number.isNaN(x) || Number.isNaN(a) || x > a ? x :Number.NaN;
+        return Number.isNaN(x) || Number.isNaN(a) || x > a ? x : Number.NaN;
       }
       function clamp(x, a, b) {
         if (x < a) return a;
@@ -150,12 +149,10 @@
         const b = (2.0 * cellnoise(i + 1) - 1.0) * (f - 1.0);
         return 2.0 * (a + (b - a) * w);
       }
-
     </script>
   </head>
-  <body >
+  <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-
   </body>
 </html>

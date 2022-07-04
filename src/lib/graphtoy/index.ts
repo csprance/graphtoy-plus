@@ -2,6 +2,19 @@
 // TODO: Allow Grapher to have a canvas set and then take in an arbitary amount of formulas with colors
 import { StoreApi, UseBoundStore } from 'zustand';
 import { MyStore } from '../../store';
+import graph from '../../components/Graph';
+
+// A formula is the data structure that describes a math formula and metadata
+export interface Formula {
+  // The value is the expression to evaluate
+  value: string;
+  // Should this formula show up in the graph
+  enabled: boolean;
+  // What is the id of this formula
+  index: number;
+  // the compiled function
+  compiledFunc: () => void;
+}
 
 export default class Grapher {
   // --- private ----------------------------------------------
@@ -56,6 +69,7 @@ export default class Grapher {
   mStartMS: number = 0;
   mTimeS: number = 0.0;
   mTheme: number = 0;
+  formulas: Formula[] = [];
   mFocusFormula: Element | null = null;
   mFunctionFun = [null, null, null, null, null, null];
   mFunctionVis = [true, true, true, true, true, true];
@@ -157,12 +171,13 @@ export default class Grapher {
     window.onresize = (ev) => {
       this.iResize(ev);
     };
+
     this.store.getState().formulas.forEach((val, idx) => {
       this.iCompile(idx);
     });
     this.iAdjustCanvas();
-    this.iDraw();
     this.togglePlay();
+    this.iDraw();
   }
 
   private iMouseUp(e: any) {
@@ -456,14 +471,14 @@ export default class Grapher {
     const t = this.mTimeS;
     this.mContext.beginPath();
     let oldy = 0.0;
-    let A,
-      B,
-      C,
-      D,
-      E,
-      F,
-      G,
-      H = 0.0;
+    let A: number,
+      B: number,
+      C: number,
+      D: number,
+      E: number,
+      F: number,
+      G: number,
+      H: number = 0.0;
 
     for (let i = 0; i < this.mXres; i++) {
       const x = this.mCx + rx * (-1.0 + (2.0 * i) / this.mXres);
@@ -525,6 +540,29 @@ export default class Grapher {
     ctx.setTransform(1, 0.0, 0.0, 1, 0.5, 0.5);
     ctx.fillStyle = theme.mBackground;
     ctx.fillRect(0, 0, this.mXres, this.mYres);
+
+    // Set the fill style and draw a rectangle
+    const gradient = this.mContext.createLinearGradient(20, 0, 220, 0);
+
+    const gradVals = Array(256)
+      .fill(null)
+      .map((_, idx) => {
+        let f = this.mFunctionFun[0];
+        if (f) {
+          // @ts-ignore
+          return f(idx / 256, this.mTimeS, 0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        return 0;
+      })
+      .map((val) => (isNaN(val) || val === Infinity ? 0 : val));
+    gradVals.forEach((val, idx) => {
+      gradient.addColorStop(
+        idx / 256,
+        `rgb(${val * 255}, ${val * 255}, ${val * 255})`
+      );
+    });
+    this.mContext.fillStyle = gradient;
+    this.mContext.fillRect(20, 20, 200, 200);
 
     if (this.mRangeType === 0 || this.mRangeType === 1) {
       ctx.fillStyle = theme.mBackgroundOut;

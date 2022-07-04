@@ -58,7 +58,7 @@ const Formulas: React.FC<Props> = ({}) => {
         </div>
       </div>
       {formulas.map((formula) => (
-        <FormulaComponent key={formula.index} formula={formula} />
+        <FormulaComponent key={formula.id} formula={formula} />
       ))}
     </div>
   );

@@ -13,24 +13,26 @@ const Wrapper = styled.div`
 interface Props {
   formula: Formula;
 }
-const FormulaComponent: React.FC<Props> = ({ formula }) => {
-  const [enabled, setEnabled] = React.useState(true);
+const FormulaComponent: React.FC<Props> = ({
+  formula: { id, value, visualizer, enabled },
+}) => {
+  const [_enabled, setEnabled] = React.useState(true);
   const { setFormulaValue, formulaColors, grapher } = useStore();
 
   return (
     <Wrapper>
       <div
-        id={`f${formula.index}`}
+        id={`f${id}`}
         onClick={() => {
           setEnabled(!enabled);
-          grapher?.toggleVisibility(formula.index);
+          grapher?.toggleVisibility(id);
         }}
         style={{
           cursor: 'pointer',
-          color: enabled ? formulaColors[formula.index - 1] : '#808080',
+          color: _enabled ? formulaColors[id - 1] : '#808080',
         }}
       >
-        f<sub>{formula.index}</sub>(x,t) = &nbsp;
+        f<sub>{id}</sub>(x,t) = &nbsp;
       </div>
       <div style={{ width: '100%' }}>
         <input
@@ -39,15 +41,15 @@ const FormulaComponent: React.FC<Props> = ({ formula }) => {
           autoCapitalize="none"
           className="userInput"
           style={{ width: '100%', borderColor: 'transparent' }}
-          name={`formula${formula.index}`}
-          id={`formula${formula.index}`}
-          value={formula.value}
+          name={`formula${id}`}
+          id={`formula${id}`}
+          value={value}
           onChange={(e) => {
-            setFormulaValue(formula.index - 1, e.target.value);
+            setFormulaValue(id - 1, e.target.value);
           }}
         />
       </div>
-      <VisualizerOptions r g b />
+      <VisualizerOptions setVisualizers={() => undefined} r g b />
     </Wrapper>
   );
 };

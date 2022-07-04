@@ -31,16 +31,17 @@ interface Props {
   r: boolean;
   g: boolean;
   b: boolean;
+  setVisualizers: () => void;
 }
-const VisualizerOptions: React.FC<Props> = ({ r, g, b }) => {
-    const toggleOthersContextMenu = (e: React.MouseEvent<HTMLInputElement>) => {
-        e.preventDefault();
-    }
+const VisualizerOptions: React.FC<Props> = ({ r, g, b,setVisualizers }) => {
+  const toggleOthersContextMenu = (e: React.MouseEvent<HTMLInputElement>) => {
+    e.preventDefault();
+  };
   return (
     <Wrapper>
-
       <MyCheckbox
         checked={r}
+        onChange={setVisualizers}
         onContextMenu={toggleOthersContextMenu}
         color={red}
         type="checkbox"
@@ -48,6 +49,7 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b }) => {
 
       <MyCheckbox
         checked={g}
+        onChange={setVisualizers}
         onContextMenu={toggleOthersContextMenu}
         color={green}
         type="checkbox"
@@ -55,11 +57,11 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b }) => {
 
       <MyCheckbox
         checked={b}
+        onChange={setVisualizers}
         onContextMenu={toggleOthersContextMenu}
         color={blue}
         type="checkbox"
       />
-
     </Wrapper>
   );
 };

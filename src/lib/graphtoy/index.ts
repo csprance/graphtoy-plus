@@ -2,7 +2,7 @@
 // TODO: Allow Grapher to have a canvas set and then take in an arbitary amount of formulas with colors
 import { StoreApi, UseBoundStore } from 'zustand';
 import { MyStore } from '../../store';
-import graph from '../../components/Graph';
+
 
 // A formula is the data structure that describes a math formula and metadata
 export interface Formula {
@@ -555,7 +555,8 @@ export default class Grapher {
         }
         return 0;
       })
-      .map((val) => (isNaN(val) || val === Infinity ? 0 : val));
+      .map((val) => (isNaN(val) || val === Infinity || val === -Infinity ? 0 : val));
+
     gradVals.forEach((val, idx) => {
       gradient.addColorStop(
         idx / 256,
@@ -678,151 +679,6 @@ export default class Grapher {
     if (this.mPaused) this.iDraw();
   }
 
-  public createLink() {
-    let url = '';
-    for (let i = 0; i < 6; i++) {
-      let id = i + 1;
-      let uiFormula: any = document.getElementById('formula' + id);
-
-      url += i === 0 ? '?' : '&';
-      url += 'f' + id + '(x,t)=' + encodeURI(uiFormula.value);
-      url +=
-        '&v' + id + '=' + (this.mFunctionVis[i] === true ? 'true' : 'false');
-    }
-    url += '&grid=' + this.mShowAxes;
-    url += '&coords=' + this.mCx + ',' + this.mCy + ',' + this.mRa;
-
-    let base = window.location.href.split('?')[0];
-    let finalURL = base + url;
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(finalURL).then(
-        function () {
-          window.location.replace(finalURL);
-        },
-        function (err) {
-          window.location.replace(finalURL);
-        }
-      );
-    } else {
-      window.location.replace(finalURL);
-    }
-  }
-
-  public parseUrlFormulas(args: any) {
-    let thereAreArgs = false;
-    for (let i = 0; i < args.length; i++) {
-      if (
-        args[i][0] === 'f' &&
-        args[i][2] === '(' &&
-        args[i][3] === 'x' &&
-        args[i][4] === ',' &&
-        args[i][5] === 't' &&
-        args[i][6] === ')' &&
-        args[i][7] === '='
-      ) {
-        let id = args[i][1] - 0;
-        let param = args[i].substring(8);
-
-        let uiFormula: any = document.getElementById('formula' + id);
-        uiFormula.value = param.replace(/\s/g, '');
-        thereAreArgs = true;
-
-        this.newFormula(id);
-      } else if (args[i][0] === 'v' && args[i][2] === '=') {
-        let id = args[i][1] - 0;
-        let param = args[i].substring(3);
-        this.iSetVisibility(id, param === 'true');
-      } else if (
-        args[i][0] === 'g' &&
-        args[i][1] === 'r' &&
-        args[i][2] === 'i' &&
-        args[i][3] === 'd' &&
-        args[i][4] === '='
-      ) {
-        let param = args[i].substring(5);
-        this.mShowAxes = parseInt(param);
-        this.iApplyGrid();
-      } else if (
-        args[i][0] === 'c' &&
-        args[i][1] === 'o' &&
-        args[i][2] === 'o' &&
-        args[i][3] === 'r' &&
-        args[i][4] === 'd' &&
-        args[i][5] === 's' &&
-        args[i][6] === '='
-      ) {
-        let param = args[i].substring(7);
-        let subargs = param.split(',');
-        this.mCx = Number(subargs[0]);
-        this.mCy = Number(subargs[1]);
-        this.mRa = Number(subargs[2]);
-        if (
-          Number.isNaN(this.mCx) ||
-          Number.isNaN(this.mCy) ||
-          Number.isNaN(this.mRa)
-        ) {
-          this.iResetCoords();
-        }
-      }
-    }
-    if (thereAreArgs) {
-      if (this.mPaused) this.iDraw();
-    } else {
-      this.sample1Formulas();
-    }
-  }
-
-  public sample1Formulas() {
-    for (let i = 0; i < 6; i++) {
-      const uiFormula: any = document.getElementById('formula' + (i + 1));
-      if (i === 0) uiFormula.value = '4 + 4*smoothstep(0,0.7,sin(x+t))';
-      if (i === 1) uiFormula.value = 'sqrt(9^2-x^2)';
-      if (i === 2) uiFormula.value = '3*sin(x)/x';
-      if (i === 3) uiFormula.value = '2*noise(3*x+t)+f3(x,t)';
-      if (i === 4) uiFormula.value = '(t + floor(x-t))/2 - 5';
-      if (i === 5) uiFormula.value = 'sin(f5(x,t)) - 5';
-      this.newFormula(i + 1);
-      this.iSetVisibility(i + 1, i !== 4);
-    }
-    this.iResetCoords();
-    if (this.mPaused) this.iDraw();
-  }
-
-  public sample2Formulas() {
-    for (let i = 0; i < 6; i++) {
-      const uiFormula: any = document.getElementById('formula' + (i + 1));
-      if (i === 0) uiFormula.value = 'sqrt(8^2-x^2)';
-      if (i === 1) uiFormula.value = '-f1(x,t)';
-      if (i === 2) uiFormula.value = '7/2-sqrt(3^2-(abs(x)-3.5)^2)';
-      if (i === 3) uiFormula.value = '7/2+sqrt(3^2-(abs(x)-3.5)^2)/2';
-      if (i === 4) uiFormula.value = '3+sqrt(1-(abs(x+sin(4*t)/2)-3)^2)*2/3';
-      if (i === 5)
-        uiFormula.value =
-          '-3-sqrt(5^2-x^2)*(1/4+pow(0.5+0.5*sin(2*PI*t),6)/10)';
-      this.newFormula(i + 1);
-      this.iSetVisibility(i + 1, true);
-    }
-    this.iResetCoords();
-    if (this.mPaused) this.iDraw();
-  }
-
-  public sample3Formulas() {
-    for (let i = 0; i < 6; i++) {
-      const uiFormula: any = document.getElementById('formula' + (i + 1));
-      if (i === 0) uiFormula.value = '2+2*sin(floor(x+t)*4321)';
-      if (i === 1) uiFormula.value = 'max(sqrt(8^2-x^2),f1(x,t))';
-      if (i === 2) uiFormula.value = '-1';
-      if (i === 3) uiFormula.value = '-2';
-      if (i === 4) uiFormula.value = '-5';
-      if (i === 5) uiFormula.value = '0';
-      this.newFormula(i + 1);
-      this.iSetVisibility(i + 1, i !== 5);
-    }
-    this.iResetCoords();
-    if (this.mPaused) this.iDraw();
-  }
-
   public resetTime() {
     this.mTimeMS = 0;
     this.mTimeS = 0.0;
@@ -854,21 +710,6 @@ export default class Grapher {
       };
       requestAnimationFrame(update);
     }
-  }
-
-  public inject(str: string) {
-    const ele: any = this.mFocusFormula;
-    if (ele == null) return;
-    let eleName = ele.getAttribute('name');
-    if (eleName == null) return;
-    if (!eleName.startsWith('formula')) return;
-
-    const start = ele.selectionStart;
-    const end = ele.selectionEnd;
-    const text = ele.value;
-    //ele.setRangeText(str, start, end, 'end');
-    ele.focus();
-    document.execCommand('insertText', false, str);
   }
 
   public newFormula(index: number) {

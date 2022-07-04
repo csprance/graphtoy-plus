@@ -14,6 +14,7 @@ const Graph: React.FC<Props> = ({}) => {
     toggleGridType,
     toggleRange,
     setGrapher,
+    parseUrlFormulas,
   } = useStore();
 
   const grapherRef = React.useRef<Grapher | null>(null);
@@ -21,34 +22,39 @@ const Graph: React.FC<Props> = ({}) => {
 
   React.useEffect(() => {
     if (!grapherRef.current) {
-      console.log('Using effect');
+      console.log('Starting Grapher');
       const grapher = new Grapher(useStore);
+      // Add Grapher to our store to use anywhere
       setGrapher(grapher);
+      // Add it to our ref
       grapherRef.current = grapher;
+      // Set the canvas so it knows where to operate
       grapher.setCanvas(canvasRef.current);
+      // Start grapher and register all the event handles/state
       grapher.start();
+
+
       useStore.subscribe((state, previousState) => {
-        // for (let i = 0; i < state.formulas.length; i++) {
+        // If our variables our different rerender all
         if (state.variables !== previousState.variables) {
           grapher.newFormula(1);
-          // Compile our formulas
+          if (grapher.mPaused) {
+            grapher.draw();
+          }
         }
-        // }
         for (let i = 0; i < state.formulas.length; i++) {
           if (state.formulas[i].value !== previousState.formulas[i].value) {
             grapher.newFormula(i + 1);
-            // Compile our formulas
+            if (grapher.mPaused) {
+              grapher.draw();
+            }
           }
         }
-
-        // TODO: Add in the new formulas when the old change
       });
-      // const args = decodeURIComponent(
-      //   window.location.href.slice(window.location.href.indexOf('?') + 1)
-      // ).split('&');
-      // grapher.parseUrlFormulas(args);
+
+      parseUrlFormulas();
     }
-  }, [setGrapher]);
+  }, [setGrapher, parseUrlFormulas]);
 
   return (
     <div

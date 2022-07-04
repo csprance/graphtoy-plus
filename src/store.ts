@@ -1,7 +1,6 @@
 import create from 'zustand';
-import produce from 'immer';
-import { devtools } from 'zustand/middleware';
 import Grapher from './lib/graphtoy';
+import { makeMapPartialByID, mapFormulaStringArray } from './lib/utils';
 
 ////////////////////////////////
 // State data
@@ -28,42 +27,38 @@ export const emptyFormula = {
   enabled: true,
   index: -1,
 };
-export const defaultFormulas: Formula[] = [
-  { enabled: true, index: 1, value: 'x' },
-  { enabled: false, index: 2, value: '' },
-  { enabled: false, index: 3, value: '' },
-  { enabled: false, index: 4, value: '' },
-  { enabled: false, index: 5, value: '' },
-  { enabled: false, index: 6, value: '' },
+export const defaultVisualizer: [boolean, boolean, boolean] = [
+  false,
+  false,
+  false,
 ];
+export const defaultFormulas: Formula[] = ['x*A', '', '', '', '', ''].map(
+  mapFormulaStringArray
+);
 export const exampleFormulas1: Formula[] = [
-  { enabled: true, index: 1, value: '4 + 4*smoothstep(0,0.7,sin(x+t))*A' },
-  { enabled: true, index: 2, value: 'sqrt(9^2-x^2)+B' },
-  { enabled: true, index: 3, value: '3*sin(x)/x+C' },
-  { enabled: true, index: 4, value: '2*noise(3*x+t)+f3(x,t) + D' },
-  { enabled: true, index: 5, value: '(t + floor(x-t))/2 - 5 + E' },
-  { enabled: true, index: 6, value: 'sin(f5(x,t)) - 5 + F' },
-];
+  '4 + 4*smoothstep(0,0.7,sin(x+t))*A',
+  'sqrt(9^2-x^2)+B',
+  '3*sin(x)/x+C',
+  '2*noise(3*x+t)+f3(x,t) + D',
+  '(t + floor(x-t))/2 - 5 + E',
+  'sin(f5(x,t)) - 5 + F',
+].map(mapFormulaStringArray);
 export const exampleFormulas2: Formula[] = [
-  { enabled: true, index: 1, value: 'sqrt(8^2-x^2)' },
-  { enabled: true, index: 2, value: '-f1(x,t)' },
-  { enabled: true, index: 3, value: '7/2-sqrt(3^2-(abs(x)-3.5)^2)' },
-  { enabled: true, index: 4, value: '7/2+sqrt(3^2-(abs(x)-3.5)^2)/2' },
-  { enabled: true, index: 5, value: '3+sqrt(1-(abs(x+sin(4*t)/2)-3)^2)*2/3' },
-  {
-    enabled: true,
-    index: 6,
-    value: '-3-sqrt(5^2-x^2)*(1/4+pow(0.5+0.5*sin(2*PI*t),6)/10)',
-  },
-];
+  'sqrt(8^2-x^2)',
+  '-f1(x,t)',
+  '7/2-sqrt(3^2-(abs(x)-3.5)^2)',
+  '7/2+sqrt(3^2-(abs(x)-3.5)^2)/2',
+  '3+sqrt(1-(abs(x+sin(4*t)/2)-3)^2)*2/3',
+  '-3-sqrt(5^2-x^2)*(1/4+pow(0.5+0.5*sin(2*PI*t),6)/10)',
+].map(mapFormulaStringArray);
 export const exampleFormulas3: Formula[] = [
-  { enabled: true, index: 1, value: '2+2*sin(floor(x+t)*4321)' },
-  { enabled: true, index: 2, value: 'max(sqrt(8^2-x^2),f1(x,t))' },
-  { enabled: true, index: 3, value: '-1' },
-  { enabled: true, index: 4, value: '-2' },
-  { enabled: true, index: 5, value: '-5' },
-  { enabled: true, index: 6, value: '0' },
-];
+  '2+2*sin(floor(x+t)*4321)',
+  'max(sqrt(8^2-x^2),f1(x,t))',
+  '-1',
+  '-2',
+  '-5',
+  '0',
+].map(mapFormulaStringArray);
 
 ////////////////////////////////
 // Types
@@ -75,7 +70,9 @@ export interface Formula {
   // Should this formula show up in the graph
   enabled: boolean;
   // What is the id of this formula
-  index: number;
+  id: number;
+  // What channel is visualized
+  visualizer: [boolean, boolean, boolean];
 }
 
 // A variable is a data structure that can be used in a formula and value dynamically adjusted with a slider
@@ -126,12 +123,20 @@ export interface Actions {
    * @param index
    * @param value
    */
-  setFormulaValue: (index: number, value: string) => void;
+  setFormulaValue: (id: number, value: string) => void;
+
+  /**
+   * Set a formula partial using an id
+   * @param index
+   * @param partial
+   */
+  setFormulaByID: (id: number, partial: Partial<Formula>) => void;
+
   /**
    * Toggle the formula visibility on and off in the grid
    * @param index
    */
-  toggleFormulaVisibility: (index: number) => void;
+  toggleFormulaVisibility: (id: number) => void;
 
   /**
    * Inject a string in to the active formula window
@@ -185,14 +190,14 @@ export interface Actions {
    * Get the url and parse the formula in to the app state
    */
   parseUrlFormulas: () => void;
-  setVariable: (index: number, partial: Partial<Variable>) => void;
+  setVariable: (id: number, partial: Partial<Variable>) => void;
   setGrapher: (grapher: Grapher) => void;
   grapher?: Grapher;
 }
 
 export type MyStore = State & Actions;
 
-export const useStore = create<State & Actions>()((set, getState) => ({
+export const useStore = create<State & Actions>()((set, get) => ({
   grapher: undefined,
   setGrapher: (grapher) => set({ grapher }),
   // ////////////////////////////
@@ -244,57 +249,74 @@ export const useStore = create<State & Actions>()((set, getState) => ({
   ],
   formulasValid: false,
   // actions
-  toggleFormulaVisibility: (index) => {
+  toggleFormulaVisibility: (id) => {
     set({ formulasValid: false });
     set((state) => ({
       formulas: [
         ...state.formulas.map((f) => ({
           ...f,
-          enabled: f.index === index ? !f.enabled : f.enabled,
+          enabled: f.id === id ? !f.enabled : f.enabled,
         })),
       ],
     }));
   },
+  setFormulaByID: (id, partial) =>
+    set((state) => ({
+      formulas: state.formulas.map(makeMapPartialByID(id + 1, partial)),
+    })),
   setFormulasValid: (status) => set((state) => ({ formulasValid: status })),
-  setFormulaValue: (index, value) =>
-    set(
-      produce((state) => {
-        state.formulasValid = false;
-        state.formulas[index] = { ...state.formulas[index], value };
-      })
-    ),
+  setFormulaValue: (id, value) => {
+    get().setFormulaByID(id, { value });
+  },
   clearFormulas: () => set({ formulas: defaultFormulas }),
-  setExampleFormulas1: () =>
-    set({ formulas: exampleFormulas1, formulasValid: false }),
-  setExampleFormulas2: () =>
-    set({ formulas: exampleFormulas2, formulasValid: false }),
-  setExampleFormulas3: () =>
-    set({ formulas: exampleFormulas3, formulasValid: false }),
+  setExampleFormulas1: () => set({ formulas: exampleFormulas1 }),
+  setExampleFormulas2: () => set({ formulas: exampleFormulas2 }),
+  setExampleFormulas3: () => set({ formulas: exampleFormulas3 }),
   inject: (value) => {
     document.execCommand('insertText', false, value);
-    set({ formulasValid: false });
   },
 
   ///////////////////////
   // link parsing stuff
-  createLink: () => {},
-  parseUrlFormulas: () => {},
+  createLink: () => {
+    // Get the state of the application that matters
+    const state = get();
+    const url = new URL(window.location.href);
+    url.searchParams.set('variables', JSON.stringify(state.variables));
+    url.searchParams.set('formulas', JSON.stringify(state.formulas));
+    // Push it to clipboard and set it as the current URL
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url.toString()).then(
+        function () {
+          window.location.replace(url);
+        },
+        function (err) {
+          window.location.replace(url);
+        }
+      );
+    } else {
+      window.location.replace(url);
+    }
+  },
+  parseUrlFormulas: () => {
+    const url = new URL(window.location.href);
+    const variables = url.searchParams.get('variables');
+    const formulas = url.searchParams.get('formulas');
+    if (formulas && variables) {
+      set({
+        formulas: JSON.parse(formulas),
+        variables: JSON.parse(variables),
+      });
+    }
+  },
 
   ///////////////////////
   // Variables
   variables: defaultVariables,
-  setVariable: (index, partial) =>
+  setVariable: (id, partial) =>
     set((state) => ({
       variables: state.variables
-        .map((v) => {
-          if (index === v.id) {
-            return {
-              ...v,
-              ...partial,
-            };
-          }
-          return v;
-        })
+        .map(makeMapPartialByID(id, partial))
         .map((v) => ({
           ...v,
           // prevent Divide by zero

@@ -14,7 +14,7 @@ services:
       traefik.docker.network: 'web'
       traefik.enable: 'true'
       traefik.backend: 'graphtoy-plus'
-      traefik.frontend.rule: 'Host:graphtoy.csprance.com,www.graphtoy.csprance.com'
+      traefik.frontend.rule: 'Host:graphtoy-plus.csprance.com,www.graphtoy-plus.csprance.com'
       traefik.port: '3000'
 
 networks:

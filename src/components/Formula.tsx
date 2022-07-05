@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { useStore, Formula } from '../store';
 import styled from 'styled-components';
+
+import { useStore } from '../store';
+import { Formula } from '../store/Formulas';
 import VisualizerOptions from './VisualizerOptions';
 
 const Wrapper = styled.div`

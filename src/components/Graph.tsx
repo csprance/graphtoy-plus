@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import Grapher from '../lib/graphtoy';
 import { useStore } from '../store';
 import PauseIcon from './PauseIcon';
@@ -29,10 +30,9 @@ const Graph: React.FC<Props> = ({}) => {
       // Add it to our ref
       grapherRef.current = grapher;
       // Set the canvas so it knows where to operate
-      grapher.setCanvas(canvasRef.current);
+      grapher.setCanvas(canvasRef.current!);
       // Start grapher and register all the event handles/state
       grapher.start();
-
 
       useStore.subscribe((state, previousState) => {
         // If our variables our different rerender all

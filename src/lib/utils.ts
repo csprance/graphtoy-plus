@@ -1,5 +1,3 @@
-import { defaultVisualizer } from '../store';
-
 export function isNumber(s: string) {
   if (['-', '-.', '.', ''].includes(s)) {
     return true;
@@ -7,13 +5,6 @@ export function isNumber(s: string) {
   const rgx = /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/;
   return s.match(rgx);
 }
-
-export const mapFormulaStringArray = (fs: string, idx: number) => ({
-  enabled: true,
-  id: idx + 1,
-  value: fs,
-  visualizer: defaultVisualizer,
-});
 
 export const makeMapPartialByID = (index: number, partial: any) => (v: any) => {
   if (index === v.id) {

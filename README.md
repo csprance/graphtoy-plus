@@ -1,8 +1,22 @@
-# Getting Started with Create React App
+# GraphToy-Plus
+> A fork of iq's GraphToy with dynamic variables and other helpful additions for graphics programming
+
+## Extras
+* Dynamic Variables
+* Extra Sharing Features
+  * Adds more features to the sharing aspect to help educate
+* Mask Visualizer
+  * Visualize a value as a mask instead of a graph
+* Written in Typescript (Much easier to extend now thanks to strong types)
+* Uses React (Could be a good or bad thing)
+* Runs in Docker with Traefik for easy deployment
+
+## Development
+### Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+### Available Scripts
 
 In the project directory, you can run:
 

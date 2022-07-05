@@ -1,7 +1,8 @@
 import * as React from 'react';
-import Variables from './Variables';
+
 import Formulas from './Formulas';
 import FunctionButtons from './FunctionButtons';
+import Variables from './Variables';
 
 interface Props {}
 const Gui: React.FC<Props> = ({}) => {

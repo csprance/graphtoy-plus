@@ -1,14 +1,17 @@
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { useStore, Variable } from '../store';
 import styled from 'styled-components';
+
 import { isNumber } from '../lib/utils';
-import RangeSlider from "./RangeSlider";
+import { useStore } from '../store';
+import { Variable } from '../store/Variables';
+import RangeSlider from './RangeSlider';
 
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 35px 80px auto 70px 70px;
-  align-items: center;margin-bottom: 5px;
+  align-items: center;
+  margin-bottom: 5px;
 `;
 
 interface Props extends Variable {}
@@ -21,16 +24,15 @@ const VariableComponent: React.FC<Props> = ({
   name,
 }) => {
   const { setVariable } = useStore();
-  const setVariableOnChange = (key: string) => (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    if (isNumber(e.target.value)) {
-      setVariable(id, { [key]: e.target.value });
-    }
-  };
+  const setVariableOnChange =
+    (key: string) => (e: ChangeEvent<HTMLInputElement>) => {
+      if (isNumber(e.target.value)) {
+        setVariable(id, { [key]: e.target.value });
+      }
+    };
   return (
     <Wrapper>
-      <div style={{textAlign: 'center'}}>{name}</div>
+      <div style={{ textAlign: 'center' }}>{name}</div>
 
       <input
         className={'userInput'}

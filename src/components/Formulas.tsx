@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { useStore } from '../store';
 import FormulaComponent from './Formula';
 

@@ -1,7 +1,8 @@
 import React from 'react';
-import Header from './components/Header';
+
 import Graph from './components/Graph';
 import Gui from './components/Gui';
+import Header from './components/Header';
 
 function App() {
   return (

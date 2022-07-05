@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import {ctrlColor, ctrlColorHover, inputBg} from '../styles';
+
+import { ctrlColor, ctrlColorHover, inputBg } from '../styles';
 
 const SliderInput = styled.input`
   appearance: none;
@@ -29,7 +30,7 @@ const SliderInput = styled.input`
     background: ${ctrlColor}; /* Green background */
     cursor: pointer; /* Cursor on hover */
     :hover {
-      background: ${ctrlColorHover}; 
+      background: ${ctrlColorHover};
     }
   }
 `;

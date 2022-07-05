@@ -1,7 +1,8 @@
 import * as React from 'react';
+import styled from 'styled-components';
+
 import { useStore } from '../store';
 import VariableComponent from './VariableComponent';
-import styled from "styled-components";
 
 const Wrapper = styled.div`
   display: grid;
@@ -20,7 +21,7 @@ const Variables: React.FC<Props> = ({}) => {
       <Wrapper>
         <div>Var</div>
         <div>Value</div>
-        <h3 style={{padding: 0, margin: 0}}>Variables</h3>
+        <h3 style={{ padding: 0, margin: 0 }}>Variables</h3>
         <div>Min</div>
         <div>Max</div>
       </Wrapper>

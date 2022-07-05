@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+
 import { blue, green, red } from '../styles';
 
 const Wrapper = styled.div`
@@ -33,7 +34,7 @@ interface Props {
   b: boolean;
   setVisualizers: () => void;
 }
-const VisualizerOptions: React.FC<Props> = ({ r, g, b,setVisualizers }) => {
+const VisualizerOptions: React.FC<Props> = ({ r, g, b, setVisualizers }) => {
   const toggleOthersContextMenu = (e: React.MouseEvent<HTMLInputElement>) => {
     e.preventDefault();
   };

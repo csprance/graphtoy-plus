@@ -1,27 +1,60 @@
+export interface GrapherTheme {
+  // The color of the background
+  mBackground: string;
+  // The masked out background color
+  mBackgroundOut: string;
+  // The color of the text
+  mText: string;
+  // The color of the wide grids
+  mGrid: string;
+  // The color of the thin grids
+  mGridThin: string;
+  // The colors of the formulas
+  mGraphs: string[];
+}
+
+export const darkTheme: GrapherTheme = {
+  mBackground: '#202020',
+  mBackgroundOut: '#000000',
+  mText: '#B0B0B0',
+  mGrid: '#606060',
+  mGridThin: '#404040',
+  mGraphs: ['#ffc040', '#ffffa0', '#a0ffc0', '#40c0ff', '#d0a0ff', '#ff80b0'],
+};
+
+export const lightTheme: GrapherTheme = {
+  mBackground: '#FFFFFF',
+  mBackgroundOut: '#808080',
+  mText: '#000000',
+  mGrid: '#A0A0A0',
+  mGridThin: '#D0D0D0',
+  mGraphs: ['#ff8000', '#ffe800', '#40ff00', '#1040ff', '#ff10ff', '#ff0000'],
+};
+
 export const FUNCS = {
   '()': {
     text: '()',
-    description: '',
+    description: 'Parenthesis',
   },
   '+': {
     text: '+',
-    description: '',
+    description: 'Add',
   },
   '-': {
     text: '-',
-    description: '',
+    description: 'Subtract',
   },
   '*': {
     text: '*',
-    description: '',
+    description: 'Multiply',
   },
   '/': {
     text: '/',
-    description: '',
+    description: 'Divide',
   },
   'rcp(x)': {
     text: 'rcp(',
-    description: '',
+    description: 'Reciprocal',
   },
   'fma(x,y,z)': {
     text: 'fma(',
@@ -29,31 +62,31 @@ export const FUNCS = {
   },
   '%': {
     text: '%',
-    description: '',
+    description: 'Modulo',
   },
   'mod(x,y)': {
     text: 'mod(',
-    description: '',
+    description: 'Modulo',
   },
   '^': {
     text: '^',
-    description: '',
+    description: 'Exponentiation',
   },
   '**': {
     text: '**',
-    description: '',
+    description: 'Exponentiation',
   },
   'pow(x,y)': {
     text: 'pow(',
-    description: '',
+    description: 'Function Exponentiation',
   },
   'exp(x)': {
     text: 'exp(',
-    description: '',
+    description: 'Exponentiation',
   },
   'exp2(x)': {
     text: 'exp2(',
-    description: '',
+    description: 'Exponentiation',
   },
   'exp10(x)': {
     text: 'exp10(',
@@ -400,3 +433,71 @@ export const FUNCS = {
     description: '',
   },
 };
+
+export const kPHI = '(1.61803398874989484820)';
+
+// ripped from Ed Mackey
+export const kBlackList = [
+  '?',
+  '=',
+  '[',
+  ']',
+  "'",
+  ';',
+  'new',
+  'ml',
+  '$',
+  ').',
+  'alert',
+  'ook',
+  'ipt',
+  'doc',
+  'win',
+  'set',
+  'get',
+  'tim',
+  'net',
+  'post',
+  'black',
+  'z',
+  'if',
+];
+
+export const symbolSubs = [
+  ['^', '**'],
+  ['²', '**2'],
+  ['³', '**3'],
+  ['\u2074', '**4'],
+  ['\u2075', '**5'],
+  ['\u2076', '**6'],
+  ['\u2077', '**7'],
+  ['\u2078', '**8'],
+  ['\u2079', '**9'],
+  ['𝜋', 'PI'],
+  ['π', 'PI'],
+  ['𝛑', 'PI'],
+  ['𝝅', 'PI'],
+  ['𝞹', 'PI'],
+  ['PHI', kPHI],
+  ['\u03C6', kPHI],
+  ['TAU', '(2*PI)'],
+  ['𝜏', '(2*PI)'],
+  ['½', '(1/2)'],
+  ['⅓', '(1/3)'],
+  ['⅔', '(2/3)'],
+  ['¼', '(1/4)'],
+  ['¾', '(3/4)'],
+  ['⅕', '(1/5)'],
+  ['⅖', '(2/5)'],
+  ['⅗', '(3/5)'],
+  ['⅘', '(4/5)'],
+  ['⅙', '(1/6)'],
+  ['⅚', '(5/6)'],
+  ['⅐', '(1/7)'],
+  ['⅛', '(1/8)'],
+  ['⅜', '(3/8)'],
+  ['⅝', '(5/8)'],
+  ['⅞', '(7/8)'],
+  ['⅑', '(1/9)'],
+  ['⅒', '(1/10)'],
+];

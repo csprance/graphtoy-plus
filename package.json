@@ -1,23 +1,13 @@
 {
-  "name": "graphtoy-plus-react",
-  "version": "0.1.0",
+  "name": "graphtoy-plus",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.11.41",
-    "@types/react": "^18.0.14",
-    "@types/react-dom": "^18.0.5",
     "immer": "^9.0.15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
     "serve": "^13.0.2",
     "styled-components": "^5.3.5",
-    "typescript": "^4.7.4",
-    "web-vitals": "^2.1.4",
     "zustand": "^4.0.0-rc.1"
   },
   "scripts": {
@@ -25,7 +15,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prettier": "prettier --write \"**/*.{ts,tsx}\" "
   },
   "eslintConfig": {
     "extends": [
@@ -46,6 +37,17 @@
     ]
   },
   "devDependencies": {
-    "@types/styled-components": "^5.1.25"
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.41",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "@types/styled-components": "^5.1.25",
+    "@trivago/prettier-plugin-sort-imports": "3.2.0",
+    "prettier": "latest",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.7.4"
   }
 }

@@ -148,8 +148,6 @@ export default class Grapher {
       drawGrid(-1, theme.mGridThin); // thin grid
       drawGrid(0, theme.mGrid); // coarse grid
 
-      this.iDrawVisualizer();
-
       // axis
       {
         const xPos = this.mXres * (0.5 - this.mCx / (2.0 * rx));
@@ -164,6 +162,8 @@ export default class Grapher {
         ctx.stroke();
       }
     }
+
+    this.iDrawVisualizer();
 
     // graphs
     for (let i = 0; i < 6; i++) {
@@ -233,7 +233,7 @@ export default class Grapher {
     }
   }
 
-  public toggleVisualizer(){
+  public toggleVisualizer() {
     this.mShowVisualizer = !this.mShowVisualizer;
     this.draw();
   }
@@ -261,7 +261,8 @@ export default class Grapher {
 
   public toggleShowAxes() {
     this.mShowAxes = (this.mShowAxes + 1) % 3;
-    this.iApplyGrid();
+    console.log(this.mShowAxes);
+    // this.iApplyGrid();
     if (this.mPaused) this.draw();
   }
 

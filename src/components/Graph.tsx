@@ -8,16 +8,31 @@ import ResetIcon from './ResetIcon';
 
 interface Props {}
 const Graph: React.FC<Props> = ({}) => {
-  const [paused, setPaused] = React.useState(false);
-  const {
-    setTime,
-    toggleGridType,
-    toggleRange,
-    setGrapher,
-    parseUrlFormulas,
-  } = useStore();
+  const { setGrapher, parseUrlFormulas } = useStore();
 
-  const [theme, setTheme] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
+  const [theme, setTheme] = React.useState('Dark');
+  const [range, setRange] = React.useState('Free');
+  const [grid, setGrid] = React.useState('Grid Dec');
+
+  const grapherToggleVisualizer = () => {
+    grapherRef.current?.toggleVisualizer();
+  };
+  const grapherToggleTheme = () => {
+    grapherRef.current?.toggleTheme();
+  };
+  const grapherToggleShowAxes = () => {
+    if (grapherRef.current?.mShowAxes === 0) setGrid('Grid Off');
+    else if (grapherRef.current?.mShowAxes === 1) setGrid('Grid Dec');
+    else if (grapherRef.current?.mShowAxes === 2) setGrid('Grid Bin');
+    grapherRef.current?.toggleShowAxes();
+  };
+  const grapherToggleRange = () => {
+    grapherRef.current?.toggleRange();
+  };
+  const grapherResetTime = () => {
+    grapherRef.current?.resetTime();
+  };
 
   const grapherRef = React.useRef<Grapher | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -76,7 +91,7 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
           id="myTheme"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={() => grapherRef.current?.toggleVisualizer()}
+          onClick={grapherToggleVisualizer}
           title="Toggle Visualizer"
         >
           Visualizer
@@ -85,28 +100,28 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
           id="myTheme"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={() => grapherRef.current?.toggleTheme()}
+          onClick={grapherToggleTheme}
           title="Set Color Scheme"
         >
-          {grapherRef.current ? grapherRef.current.mTheme === 0 ? 'Dark' : 'Light' : 'Dark'}
+          {theme}
         </div>
         <div
           id="myAxes"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={() => grapherRef.current?.toggleShowAxes()}
+          onClick={grapherToggleShowAxes}
           title="Show/Hide Grid"
         >
-          Grid Dec
+          {grid}
         </div>
         <div
           id="myRange"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={() => grapherRef.current?.toggleRange()}
+          onClick={grapherToggleRange}
           title="Choose navigation mode"
         >
-          Free
+          {range}
         </div>
       </div>
       <canvas
@@ -126,7 +141,7 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
         <div
           className="userInputButtonsMedium"
           style={{ marginRight: 12 }}
-          onClick={() => grapherRef.current?.resetTime()}
+          onClick={grapherResetTime}
         >
           <ResetIcon />
         </div>

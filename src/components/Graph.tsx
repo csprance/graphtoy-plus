@@ -11,26 +11,27 @@ const Graph: React.FC<Props> = ({}) => {
   const [paused, setPaused] = React.useState(false);
   const {
     setTime,
-    toggleTheme,
     toggleGridType,
     toggleRange,
     setGrapher,
     parseUrlFormulas,
   } = useStore();
 
+  const [theme, setTheme] = React.useState(0);
+
   const grapherRef = React.useRef<Grapher | null>(null);
-  const canvasRef = React.useRef(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   React.useEffect(() => {
-    if (!grapherRef.current) {
+    if (!grapherRef.current && canvasRef.current) {
       console.log('Starting Grapher');
       const grapher = new Grapher(useStore);
+      // Set the canvas so it knows where to operate
+      grapher.setCanvas(canvasRef.current);
       // Add Grapher to our store to use anywhere
       setGrapher(grapher);
       // Add it to our ref
       grapherRef.current = grapher;
-      // Set the canvas so it knows where to operate
-      grapher.setCanvas(canvasRef.current!);
       // Start grapher and register all the event handles/state
       grapher.start();
 
@@ -75,16 +76,25 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
           id="myTheme"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={toggleTheme}
+          onClick={() => grapherRef.current?.toggleVisualizer()}
+          title="Toggle Visualizer"
+        >
+          Visualizer
+        </div>
+        <div
+          id="myTheme"
+          className="userInputButtonsBig"
+          style={{ marginRight: 12 }}
+          onClick={() => grapherRef.current?.toggleTheme()}
           title="Set Color Scheme"
         >
-          Dark
+          {grapherRef.current ? grapherRef.current.mTheme === 0 ? 'Dark' : 'Light' : 'Dark'}
         </div>
         <div
           id="myAxes"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={toggleGridType}
+          onClick={() => grapherRef.current?.toggleShowAxes()}
           title="Show/Hide Grid"
         >
           Grid Dec
@@ -93,7 +103,7 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
           id="myRange"
           className="userInputButtonsBig"
           style={{ marginRight: 12 }}
-          onClick={toggleRange}
+          onClick={() => grapherRef.current?.toggleRange()}
           title="Choose navigation mode"
         >
           Free
@@ -116,7 +126,7 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
         <div
           className="userInputButtonsMedium"
           style={{ marginRight: 12 }}
-          onClick={() => setTime(0)}
+          onClick={() => grapherRef.current?.resetTime()}
         >
           <ResetIcon />
         </div>

@@ -38,6 +38,7 @@ export default class Grapher {
   mXres: number = 0;
   mYres: number = 0;
   mStore: UseBoundStore<StoreApi<MyStore>>;
+  mShowVisualizer: boolean = true;
 
   constructor(store: UseBoundStore<StoreApi<MyStore>>) {
     this.mStore = store;
@@ -232,6 +233,11 @@ export default class Grapher {
     }
   }
 
+  public toggleVisualizer(){
+    this.mShowVisualizer = !this.mShowVisualizer;
+    this.draw();
+  }
+
   public newFormula(index: number) {
     const id = index - 1;
     for (let i = id; i < 6; i++) {
@@ -358,32 +364,34 @@ export default class Grapher {
   }
 
   private iDrawVisualizer() {
-    const ctx = this.mContext;
-    const xRes = 256;
-    // Set the fill style and draw a rectangle
-    const gradient = ctx.createLinearGradient(20, 0, 220, 0);
-    // Evaluate the function to create the necessary amount of x resolution on our gradient
-    const gradVals = Array(xRes)
-      .fill(null)
-      .map((_, idx) => {
-        let f = this.mFunctionFun[0];
-        if (f) {
-          // @ts-ignore
-          return f(idx / xRes, this.mTimeS);
-        }
-        return 0;
-      })
-      .map((val) =>
-        isNaN(val) || val === Infinity || val === -Infinity ? 0 : val,
-      );
-    gradVals.forEach((val, idx) => {
-      gradient.addColorStop(
-        idx / 256,
-        `rgb(${val * 255}, ${val * 255}, ${val * 255})`,
-      );
-    });
-    ctx.fillStyle = gradient;
-    ctx.fillRect(20, 20, 200, 200);
+    if (this.mShowVisualizer) {
+      const ctx = this.mContext;
+      const xRes = 256;
+      // Set the fill style and draw a rectangle
+      const gradient = ctx.createLinearGradient(20, 0, 220, 0);
+      // Evaluate the function to create the necessary amount of x resolution on our gradient
+      const gradVals = Array(xRes)
+        .fill(null)
+        .map((_, idx) => {
+          let f = this.mFunctionFun[0];
+          if (f) {
+            // @ts-ignore
+            return f(idx / xRes, this.mTimeS);
+          }
+          return 0;
+        })
+        .map((val) =>
+          isNaN(val) || val === Infinity || val === -Infinity ? 0 : val,
+        );
+      gradVals.forEach((val, idx) => {
+        gradient.addColorStop(
+          idx / 256,
+          `rgb(${val * 255}, ${val * 255}, ${val * 255})`,
+        );
+      });
+      ctx.fillStyle = gradient;
+      ctx.fillRect(20, 20, 200, 200);
+    }
   }
 
   private iApplyFormulaVisibilityColor(index: number) {

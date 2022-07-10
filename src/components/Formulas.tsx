@@ -4,7 +4,7 @@ import { useStore } from '../store';
 import FormulaComponent from './Formula';
 
 interface Props {}
-const Formulas: React.FC<Props> = ({}) => {
+const Formulas: React.FC<Props> = () => {
   const {
     formulas,
     clearFormulas,

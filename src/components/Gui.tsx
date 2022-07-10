@@ -5,7 +5,7 @@ import FunctionButtons from './FunctionButtons';
 import Variables from './Variables';
 
 interface Props {}
-const Gui: React.FC<Props> = ({}) => {
+const Gui: React.FC<Props> = () => {
   return (
     <>
       {/*Variable Window */}

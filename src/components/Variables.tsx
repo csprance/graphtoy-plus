@@ -13,7 +13,7 @@ const Wrapper = styled.div`
 `;
 
 interface Props {}
-const Variables: React.FC<Props> = ({}) => {
+const Variables: React.FC<Props> = () => {
   const { variables } = useStore();
 
   return (

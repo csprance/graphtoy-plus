@@ -18,6 +18,7 @@ interface Props {
 const FormulaComponent: React.FC<Props> = ({
   formula: { id, value, visualizer, enabled },
 }) => {
+  const [r, g, b] = visualizer;
   const [_enabled, setEnabled] = React.useState(true);
   const { setFormulaValue, formulaColors, grapher } = useStore();
 
@@ -51,7 +52,7 @@ const FormulaComponent: React.FC<Props> = ({
           }}
         />
       </div>
-      <VisualizerOptions setVisualizers={() => undefined} r g b />
+      <VisualizerOptions id={id} r={r} g={g} b={b} />
     </Wrapper>
   );
 };

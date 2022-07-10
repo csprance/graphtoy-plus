@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface Props {}
-const Header: React.FC<Props> = ({}) => {
+const Header: React.FC<Props> = () => {
   return (
     <div className="ml">
       <h1>Graphtoy + v0.4.1</h1>

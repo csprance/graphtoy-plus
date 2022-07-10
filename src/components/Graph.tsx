@@ -1,76 +1,40 @@
 import * as React from 'react';
 
-import Grapher from '../lib/graphtoy';
 import { useStore } from '../store';
-import PauseIcon from './PauseIcon';
-import PlayIcon from './PlayIcon';
-import ResetIcon from './ResetIcon';
+import Coords from './Coords';
+import Grapher from './Grapher';
+import Time from './Time';
+import TimelineControls from './TimelineControls';
 
 interface Props {}
-const Graph: React.FC<Props> = ({}) => {
-  const { setGrapher, parseUrlFormulas } = useStore();
+const Graph: React.FC<Props> = () => {
+  const { grapher } = useStore();
 
-  const [paused, setPaused] = React.useState(false);
   const [theme, setTheme] = React.useState('Dark');
   const [range, setRange] = React.useState('Free');
   const [grid, setGrid] = React.useState('Grid Dec');
 
   const grapherToggleVisualizer = () => {
-    grapherRef.current?.toggleVisualizer();
+    grapher.toggleVisualizer();
   };
   const grapherToggleTheme = () => {
-    grapherRef.current?.toggleTheme();
+    grapher.toggleTheme();
+    if (grapher.mTheme === 0) setTheme('Dark');
+    if (grapher.mTheme === 1) setTheme('Light');
   };
   const grapherToggleShowAxes = () => {
-    if (grapherRef.current?.mShowAxes === 0) setGrid('Grid Off');
-    else if (grapherRef.current?.mShowAxes === 1) setGrid('Grid Dec');
-    else if (grapherRef.current?.mShowAxes === 2) setGrid('Grid Bin');
-    grapherRef.current?.toggleShowAxes();
+    grapher.toggleShowAxes();
+    if (grapher.mShowAxes === 0) setGrid('Grid Off');
+    if (grapher.mShowAxes === 1) setGrid('Grid Dec');
+    if (grapher.mShowAxes === 2) setGrid('Grid Bin');
   };
+
   const grapherToggleRange = () => {
-    grapherRef.current?.toggleRange();
+    grapher.toggleRange();
+    if (grapher.mRangeType === 0) setRange('0..1');
+    if (grapher.mRangeType === 1) setRange('-1..1');
+    if (grapher.mRangeType === 2) setRange('Free');
   };
-  const grapherResetTime = () => {
-    grapherRef.current?.resetTime();
-  };
-
-  const grapherRef = React.useRef<Grapher | null>(null);
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-
-  React.useEffect(() => {
-    if (!grapherRef.current && canvasRef.current) {
-      console.log('Starting Grapher');
-      const grapher = new Grapher(useStore);
-      // Set the canvas so it knows where to operate
-      grapher.setCanvas(canvasRef.current);
-      // Add Grapher to our store to use anywhere
-      setGrapher(grapher);
-      // Add it to our ref
-      grapherRef.current = grapher;
-      // Start grapher and register all the event handles/state
-      grapher.start();
-
-      useStore.subscribe((state, previousState) => {
-        // If our variables our different rerender all
-        if (state.variables !== previousState.variables) {
-          grapher.newFormula(1);
-          if (grapher.mPaused) {
-            grapher.draw();
-          }
-        }
-        for (let i = 0; i < state.formulas.length; i++) {
-          if (state.formulas[i].value !== previousState.formulas[i].value) {
-            grapher.newFormula(i + 1);
-            if (grapher.mPaused) {
-              grapher.draw();
-            }
-          }
-        }
-      });
-
-      parseUrlFormulas();
-    }
-  }, [setGrapher, parseUrlFormulas]);
 
   return (
     <div
@@ -124,36 +88,15 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
           {range}
         </div>
       </div>
-      <canvas
-        ref={canvasRef}
-        id="mainCanvas"
-        style={{ width: '100%', height: 'auto' }}
-        width={1664}
-        height={1248}
-      />
+
+      <Grapher />
+
       <div id="formulaParamBar">
-        <div id="myCoords" style={{ marginRight: 'auto' }}>
-          (0, 0)
-        </div>
-        <div id="myTime" style={{ width: 102 }}>
-          t = 0.0
-        </div>
-        <div
-          className="userInputButtonsMedium"
-          style={{ marginRight: 12 }}
-          onClick={grapherResetTime}
-        >
-          <ResetIcon />
-        </div>
-        <div
-          className="userInputButtonsMedium"
-          onClick={() => {
-            setPaused(!paused);
-            grapherRef.current!.togglePlay();
-          }}
-        >
-          {paused ? <PlayIcon /> : <PauseIcon />}
-        </div>
+        <Coords />
+
+        <Time />
+
+        <TimelineControls />
       </div>
     </div>
   );

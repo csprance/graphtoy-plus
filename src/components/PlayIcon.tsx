@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface Props {}
-const PlayIcon: React.FC<Props> = ({}) => {
+const PlayIcon: React.FC<Props> = () => {
   return (
     <svg
       style={{ transform: 'scale(.7)', fill: 'white' }}

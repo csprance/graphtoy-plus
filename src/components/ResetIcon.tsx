@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface Props {}
-const ResetIcon: React.FC<Props> = ({}) => {
+const ResetIcon: React.FC<Props> = () => {
   return (
     <svg
       style={{ transform: 'scale(.7)', fill: 'white' }}

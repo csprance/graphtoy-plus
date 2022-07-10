@@ -1,9 +1,11 @@
+import produce from 'immer';
 import create from 'zustand';
 
 import Grapher from '../lib/graphtoy';
-import { makeMapPartialByID } from '../lib/utils';
+import { makeMapPartialByID, sortById } from '../lib/utils';
 import {
   Formula,
+  VisualizerState,
   defaultFormulas,
   exampleFormulas1,
   exampleFormulas2,
@@ -12,53 +14,35 @@ import {
 import { Variable, defaultVariables } from './Variables';
 
 export interface State {
-  // This is used as the t value in our equations
-  time: number;
-  // What theme is applied light or dark default = dark
-  theme: 'light' | 'dark';
   // An array of all the formulas displayed on the graph
   formulas: Formula[];
   // An array of all the formula colors
   formulaColors: string[];
-  // What range do we display in the graph default 2
-  rangeType: number; // [0, 1, 2] [0..1 = 0, -1..1 = 1, Free = 2]
-  // What grid type are we displaying default = 1
-  gridType: number; // [0, 1, 2] [Grid Off = 0 , Grid Dec = 1, Grid Bin = 2]
-  // Is time currently paused default = false
-  paused: boolean;
   // An array of adjustable variables used in formulas
   variables: Variable[];
 }
 
 export interface Actions {
   /**
-   * Set the time value to whatever value
-   * @param time
-   */
-  setTime: (time: number) => void;
-  /**
    * Set the formula value based on an index
-   * @param index
+   * @param id
    * @param value
    */
   setFormulaValue: (id: number, value: string) => void;
-
   /**
    * Set a formula partial using an id
-   * @param index
+   * @param id
    * @param partial
    */
   setFormulaByID: (id: number, partial: Partial<Formula>) => void;
-
   /**
    * Toggle the formula visibility on and off in the grid
-   * @param index
+   * @param id The ID of the formula to toggle
    */
   toggleFormulaVisibility: (id: number) => void;
-
   /**
    * Inject a string in to the active formula window
-   * @param value
+   * @param value The value to inject
    */
   inject: (value: string) => void;
   /**
@@ -78,23 +62,11 @@ export interface Actions {
    */
   setExampleFormulas3: () => void;
   /**
-   * Toggle the theme between light and dark
+   * Set and derive the state of the visualizers on each Formula given a visualizer state and an id
+   * @param id The ID of the formula to set the visualizer state on
+   * @param visualizerState a VisualizerState
    */
-  toggleTheme: () => void;
-  /**
-   * Toggle the grid type between
-   * [0, 1, 2] [Grid Off = 0 , Grid Dec = 1, Grid Bin = 2]
-   */
-  toggleGridType: () => void;
-  /**
-   * Toggle the range between
-   * [0, 1, 2] [0..1 = 0, -1..1 = 1, Free = 2]
-   */
-  toggleRange: () => void;
-  /**
-   * Play or pause the graph time
-   */
-  togglePlay: () => void;
+  setVisualizers: (id: number, visualizerState: VisualizerState) => void;
   /**
    * Given the state of the application create a link we can parse into the app state
    */
@@ -103,50 +75,27 @@ export interface Actions {
    * Get the url and parse the formula in to the app state
    */
   parseUrlFormulas: () => void;
+  /**
+   * Set a value on a variable
+   * @param id The ID of the variable to set
+   * @param partial A partial of a Variable to set
+   */
   setVariable: (id: number, partial: Partial<Variable>) => void;
+  /**
+   * Add Grapher to our state to manipulate it globally
+   * @param grapher
+   */
   setGrapher: (grapher: Grapher) => void;
-  grapher?: Grapher;
+  grapher: Grapher;
 }
 
 export type MyStore = State & Actions;
 
 export const useStore = create<MyStore>()((set, get) => ({
-  grapher: undefined,
+  // ////////////////////////////
+  // Grapher
+  grapher: new Grapher(),
   setGrapher: (grapher) => set({ grapher }),
-  // ////////////////////////////
-  // Time Data
-  //state
-  time: 0,
-  paused: false,
-  //actions
-  setTime: (time) => set((state) => ({ time })),
-  togglePlay: () => {
-    set((state) => ({
-      paused: !state.paused,
-    }));
-  },
-  // ////////////////////////////
-  // Theme
-  // state
-  theme: 'light',
-  // actions
-  toggleTheme: () =>
-    set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
-
-  // ////////////////////////////
-  // Grid Data
-  // state
-  gridType: 0,
-  // actions
-  toggleGridType: () =>
-    set((state) => ({ gridType: (state.gridType + 1) % 3 })),
-
-  // ////////////////////////////
-  // Range Data
-  // state
-  rangeType: 2,
-  // actions
-  toggleRange: () => set((state) => ({ rangeType: (state.rangeType + 1) % 3 })),
 
   // ////////////////////////////
   // Formulas
@@ -172,7 +121,9 @@ export const useStore = create<MyStore>()((set, get) => ({
     })),
   setFormulaByID: (id, partial) =>
     set((state) => ({
-      formulas: state.formulas.map(makeMapPartialByID(id + 1, partial)),
+      formulas: state.formulas
+        .map(makeMapPartialByID(id + 1, partial))
+        .sort(sortById),
     })),
   setFormulaValue: (id, value) => {
     get().setFormulaByID(id, { value });
@@ -181,6 +132,24 @@ export const useStore = create<MyStore>()((set, get) => ({
   setExampleFormulas1: () => set({ formulas: exampleFormulas1 }),
   setExampleFormulas2: () => set({ formulas: exampleFormulas2 }),
   setExampleFormulas3: () => set({ formulas: exampleFormulas3 }),
+  setVisualizers: (id, visualizerState) =>
+    set(
+      produce((draft) => {
+        // Given an id and a visualizer state for that formula derive the other visualizer states
+        // Only one Channel can be active for all formulas (One Red for all Formulas, One Green, one Blue)
+        // Set the one we want to modify
+
+        // Loop through the others and decide if they should be turned off
+        for (let i = 0; i < draft.formulas.length; i++) {
+          const f = draft.formulas[i];
+          // If a value is true then all the others should be false otherwise leave em the same
+          f.visualizer[0] = visualizerState[0] ? false : f.visualizer[0];
+          f.visualizer[1] = visualizerState[1] ? false : f.visualizer[1];
+          f.visualizer[2] = visualizerState[2] ? false : f.visualizer[2];
+        }
+        draft.formulas[id].visualizer = visualizerState;
+      }),
+    ),
   inject: (value) => {
     document.execCommand('insertText', false, value);
   },

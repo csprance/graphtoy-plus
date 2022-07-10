@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useStore } from '../store';
 
 interface Props {}
-const FunctionButtons: React.FC<Props> = ({}) => {
+const FunctionButtons: React.FC<Props> = () => {
   const { inject } = useStore();
   return (
     <div className="guiWindow">

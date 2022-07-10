@@ -1,9 +1,6 @@
-//=== grapher ===================================================
-// TODO: Allow Grapher to take in an arbitary amount of formulas string formulas with colors
-import { StoreApi, UseBoundStore } from 'zustand';
-
-import { MyStore } from '../../store';
-import { isBadNum } from '../utils';
+import { Formula, defaultFormulas } from '../../store/Formulas';
+import { Variable, defaultVariables } from '../../store/Variables';
+import { isBadNum, noop, sortById } from '../utils';
 import {
   GrapherTheme,
   darkTheme,
@@ -11,6 +8,24 @@ import {
   lightTheme,
   symbolSubs,
 } from './constants';
+
+type FncFormula = (x: number, t: number) => number;
+
+export type OnTimeUpdate = (t: number) => void;
+export type OnCoordUpdate = (x: number, y: number) => void;
+export type OnFormulaError = ({
+  error,
+  formula,
+}: {
+  error: string;
+  formula: Formula;
+}) => void;
+
+export interface GrapherOnEventFunctions {
+  onTimeUpdate: OnTimeUpdate;
+  onCoordUpdate: OnCoordUpdate;
+  onFormulaError: OnFormulaError;
+}
 
 export default class Grapher {
   mCanvas!: HTMLCanvasElement;
@@ -25,34 +40,55 @@ export default class Grapher {
   mRefRa: number = -1.0;
   mRefMouseX: number = -1.0;
   mRefMouseY: number = -1.0;
-  mRangeType: number = 2;
-  mShowAxes: number = 1;
+  mRangeType: number = 2; // [0, 1, 2] [0..1 = 0, -1..1 = 1, Free = 2]
+  mShowAxes: number = 1; // [0, 1, 2] [Grid Off = 0 , Grid Dec = 1, Grid Bin = 2]
   mPaused: boolean = true;
   mTimeMS: number = 0;
   mOffsetMS: number = 0;
   mStartMS: number = 0;
   mTimeS: number = 0.0;
-  mTheme: number = 0;
-  mFunctionFun: Array<Function | null> = [null, null, null, null, null, null];
+  mTheme: number = 0; // [0, 1] [0 = Dark, 1 = Light]
+  mFormulas: Formula[] = defaultFormulas;
+  mVariables: Variable[] = defaultVariables;
+  mFunctionFun: Array<FncFormula | null> = [null, null, null, null, null, null];
   mFunctionVis: boolean[] = [true, true, true, true, true, true];
+  mFunctionVisualizer: [number, number, number] = [0, 1, 2];
   mXres: number = 0;
   mYres: number = 0;
-  mStore: UseBoundStore<StoreApi<MyStore>>;
   mShowVisualizer: boolean = true;
-
-  constructor(store: UseBoundStore<StoreApi<MyStore>>) {
-    this.mStore = store;
-  }
+  mCoords: [number, number] = [0, 0];
 
   public setCanvas(canvas: HTMLCanvasElement) {
     this.mCanvas = canvas;
     this.mContext = this.mCanvas.getContext('2d')!;
   }
 
-  public start() {
+  public registerCoordListener(onCoordUpdateFn: OnCoordUpdate) {
+    this.onCoordUpdate = onCoordUpdateFn;
+  }
+
+  public registerTimeListener(onTimeUpdateFn: OnTimeUpdate) {
+    this.onTimeUpdate = onTimeUpdateFn;
+  }
+
+  public registerErrorListener(onFormulaError: OnFormulaError) {
+    this.onFormulaError = onFormulaError;
+  }
+
+  public start(
+    config: GrapherOnEventFunctions = {
+      onCoordUpdate: noop,
+      onTimeUpdate: noop,
+      onFormulaError: noop,
+    },
+  ) {
+    this.onTimeUpdate = config.onTimeUpdate;
+    this.onCoordUpdate = config.onCoordUpdate;
+    this.onFormulaError = config.onFormulaError;
+
     this.iRegisterEventListeners();
     // Compile all of our formulas
-    this.mStore.getState().formulas.forEach((val, idx) => {
+    this.mFormulas.forEach((val, idx) => {
       this.iCompile(idx);
     });
     this.iAdjustCanvas();
@@ -68,7 +104,7 @@ export default class Grapher {
     } else if (this.mRangeType === 1) {
       this.mCx = 0.0;
       this.mCy = 0.0;
-      this.mRa = (1.0 * this.mXres) / this.mYres;
+      this.mRa = this.mXres / this.mYres;
     }
 
     const rx = this.mRa;
@@ -166,38 +202,23 @@ export default class Grapher {
     this.iDrawVisualizer();
 
     // graphs
-    for (let i = 0; i < 6; i++) {
+    for (const formula of this.mFormulas) {
       // Check and make sure our formulas are valid
-      const strFormula = this.mStore.getState().formulas[i].value;
-      if (strFormula == null) {
-        continue;
-      }
-      if (strFormula === '') {
+      const strFormula = formula.value;
+      if (strFormula == null || strFormula === '') {
         continue;
       }
       if (!Grapher.iNotOnBlackList(strFormula)) continue;
 
       // Draw the Graph if it's enabled
-      if (this.mFunctionVis[i]) {
-        this.iDrawGraph(i, theme.mGraphs[i]);
+      if (this.mFunctionVis[formula.id]) {
+        this.iDrawGraph(formula.id, theme.mGraphs[formula.id]);
       }
     }
   }
 
-  public clearFormulas() {
-    for (let i = 0; i < 6; i++) {
-      const uiFormula: any = document.getElementById('formula' + (i + 1));
-      uiFormula.value = '';
-      let vis = false;
-      if (i === 0) {
-        uiFormula.value = 'x';
-        vis = true;
-      }
-      this.newFormula(i + 1);
-      this.iSetVisibility(i + 1, vis);
-    }
-    this.iResetCoords();
-    if (this.mPaused) this.draw();
+  public getFormulas() {
+    return this.mFormulas.sort(sortById);
   }
 
   public resetTime() {
@@ -207,26 +228,22 @@ export default class Grapher {
     this.mOffsetMS = 0;
     if (this.mPaused) {
       this.draw();
-      let eleTime: any = document.getElementById('myTime');
-      eleTime.textContent = 't = ' + this.mTimeS.toFixed(2);
     }
+    this.onTimeUpdate(0);
   }
 
   public togglePlay() {
     this.mPaused = !this.mPaused;
 
     if (!this.mPaused) {
-      const eleTime: any = document.getElementById('myTime');
       this.mStartMS = 0;
       this.mOffsetMS = this.mTimeMS;
       const update = (time: number) => {
         if (this.mStartMS === 0) this.mStartMS = time;
-
         this.mTimeMS = this.mOffsetMS + (time - this.mStartMS);
         this.mTimeS = this.mTimeMS / 1000.0;
-        eleTime.textContent = 't = ' + this.mTimeS.toFixed(2);
-
         this.draw();
+        this.onTimeUpdate(this.mTimeS);
         if (!this.mPaused) requestAnimationFrame(update);
       };
       requestAnimationFrame(update);
@@ -238,18 +255,43 @@ export default class Grapher {
     this.draw();
   }
 
-  public newFormula(index: number) {
-    const id = index - 1;
-    for (let i = id; i < 6; i++) {
-      this.iCompile(i);
+  /**
+   * Complete replace the formulas with whatever is passed in
+   */
+  public setFormulas(formulas: Formula[], recompile = false) {
+    console.log('Setting Formulas');
+    this.mFormulas = formulas;
+    if (recompile) this.recompileAllFormulas();
+    if (this.mPaused) this.draw();
+  }
+
+  public setVariables(variables: Variable[], recompile = false) {
+    // console.log('Setting Variable');
+    this.mVariables = variables;
+    if (recompile) this.recompileAllFormulas();
+    if (this.mPaused) this.draw();
+  }
+
+  /**
+   * Just update a single Formula by an ID
+   * @param id The formula ID to update
+   * @param formula The Formula to update it with
+   */
+  public updateFormulaById(id: number, formula: Formula) {
+    // console.log('Updating one');
+    this.mFormulas[id] = formula;
+    // Update all the formulas after the id
+    this.recompileAllFormulas();
+  }
+
+  public recompileAllFormulas() {
+    for (const formula of this.mFormulas) {
+      this.iCompile(formula.id);
     }
   }
 
   public toggleTheme() {
     this.mTheme = 1 - this.mTheme;
-    for (let i = 0; i < 6; i++) {
-      this.iApplyFormulaVisibilityColor(i + 1);
-    }
     if (this.mPaused) this.draw();
   }
 
@@ -261,8 +303,6 @@ export default class Grapher {
 
   public toggleShowAxes() {
     this.mShowAxes = (this.mShowAxes + 1) % 3;
-    console.log(this.mShowAxes);
-    // this.iApplyGrid();
     if (this.mPaused) this.draw();
   }
 
@@ -271,8 +311,14 @@ export default class Grapher {
     if (this.mPaused) this.draw();
   }
 
+  public resetCoords() {
+    this.mCx = 0.0;
+    this.mCy = 0.0;
+    this.mRa = 12.0;
+  }
+
   private iCompile(id: number) {
-    const formulas = this.mStore.getState().formulas;
+    const formulas = this.mFormulas;
     const strFormula = formulas[id].value;
 
     this.mFunctionFun[id] = null;
@@ -281,35 +327,39 @@ export default class Grapher {
     if (strFormula === '') return;
     if (!Grapher.iNotOnBlackList(strFormula)) return;
 
+    // console.log(`Compiling ${id}`);
     // Compile our functions in to one function
     let fncString = 'with(Math){';
-    if (id >= 1)
+    if (id >= 0)
       fncString += 'function f1(x,t){return (' + formulas[0].value + ');}';
-    if (id >= 2)
+    if (id >= 1)
       fncString += 'function f2(x,t){return (' + formulas[1].value + ');}';
-    if (id >= 3)
+    if (id >= 2)
       fncString += 'function f3(x,t){return (' + formulas[2].value + ');}';
-    if (id >= 4)
+    if (id >= 3)
       fncString += 'function f4(x,t){return (' + formulas[3].value + ');}';
-    if (id >= 5)
+    if (id >= 4)
       fncString += 'function f5(x,t){return (' + formulas[4].value + ');}';
 
     fncString = fncString + 'return(' + strFormula + ');}';
 
+    // console.log(`FncString: ${fncString}`);
+
     // Do our symbol and variable replacement
-    const variableStrSubs = this.mStore
-      .getState()
-      .variables.map((v) => [v.name, String(v.value)]);
+    const variableStrSubs = this.mVariables.map((v) => [
+      v.name,
+      String(v.value),
+    ]);
     fncString = [...symbolSubs, ...variableStrSubs].reduce(
       (acc, current) => acc.split(current[0]).join(current[1]),
       fncString,
     );
 
     // Try to compile our function and test that it works
-    let fnFormula: any = null;
+    let fnFormula: FncFormula;
     try {
       // eslint-disable-next-line no-new-func
-      fnFormula = Function('x,t', fncString);
+      fnFormula = Function('x,t', fncString) as FncFormula;
     } catch (err) {
       return;
     }
@@ -317,6 +367,7 @@ export default class Grapher {
       fnFormula(0.1, 0.2);
     } catch (err) {
       // TODO: Show the user this error here
+      this.onFormulaError({ error: err as string, formula: formulas[id] });
       console.log(err);
       return;
     }
@@ -325,12 +376,20 @@ export default class Grapher {
     this.mFunctionFun[id] = fnFormula;
   }
 
-  private iDrawGraph(id: number, mycolor: any) {
+  /**
+   * Actually draw the graph to the canvas
+   * @param id The formula ID to draw
+   * @param myColor The color to draw the formula in
+   * @private
+   */
+  private iDrawGraph(id: number, myColor: string) {
+    const formula = this.mFunctionFun[id];
+    if (!formula) return false;
+
     const ctx = this.mContext;
     let oldBadNum = true;
     let success = true;
 
-    const formula = this.mFunctionFun[id];
     const rx = this.mRa;
     const ry = (this.mRa * this.mYres) / this.mXres;
     const t = this.mTimeS;
@@ -341,7 +400,6 @@ export default class Grapher {
       const x = this.mCx + rx * (-1.0 + (2.0 * i) / this.mXres);
       let y = 0.0;
       try {
-        // @ts-ignore
         y = formula(x, t);
       } catch (err) {
         success = false;
@@ -356,9 +414,9 @@ export default class Grapher {
       oldBadNum = badNum;
     }
     // Stroke the path we created
-    ctx.strokeStyle = mycolor;
+    ctx.strokeStyle = myColor;
     ctx.lineWidth = this.mTheme === 0 ? 2.0 : 3.0;
-    ctx.fillStyle = mycolor;
+    ctx.fillStyle = myColor;
     ctx.stroke();
 
     return success;
@@ -370,50 +428,27 @@ export default class Grapher {
       const xRes = 256;
       // Set the fill style and draw a rectangle
       const gradient = ctx.createLinearGradient(20, 0, 220, 0);
-      // Evaluate the function to create the necessary amount of x resolution on our gradient
+      // Fetch our functions that have visualizer in the correct channel positions [func, func, func]
+      const visualizedFuncs = this.iGetVisualizedFuncs();
+      // Evaluate the function to create the necessary amount of x resolution on our gradient for each channel
       const gradVals = Array(xRes)
         .fill(null)
-        .map((_, idx) => {
-          let f = this.mFunctionFun[0];
-          if (f) {
-            // @ts-ignore
-            return f(idx / xRes, this.mTimeS);
-          }
-          return 0;
-        })
-        .map((val) =>
-          isNaN(val) || val === Infinity || val === -Infinity ? 0 : val,
-        );
-      gradVals.forEach((val, idx) => {
-        gradient.addColorStop(
-          idx / 256,
-          `rgb(${val * 255}, ${val * 255}, ${val * 255})`,
-        );
+        .map((_, idx) =>
+          visualizedFuncs.map((f) =>
+            f ? f(idx / xRes, this.mTimeS) * 255 : 0.0,
+          ),
+        )
+        .map((rgb) => rgb.map((p) => (isBadNum(p) ? 0.0 : p)));
+      gradVals.forEach(([r, g, b], idx) => {
+        gradient.addColorStop(idx / 256, `rgb(${r}, ${g}, ${b})`);
       });
       ctx.fillStyle = gradient;
       ctx.fillRect(20, 20, 200, 200);
     }
   }
 
-  private iApplyFormulaVisibilityColor(index: number) {
-    const id = index - 1;
-    const ele: any = document.getElementById('f' + index);
-    const vis = this.mFunctionVis[id];
-    if (vis) ele.classList.add('formVisDar' + index);
-    else ele.classList.remove('formVisDar' + index);
-  }
-
-  private iApplyGrid() {
-    const ele: any = document.getElementById('myAxes');
-    if (this.mShowAxes === 0) ele.textContent = 'Grid Off';
-    else if (this.mShowAxes === 1) ele.textContent = 'Grid Dec';
-    else if (this.mShowAxes === 2) ele.textContent = 'Grid Bin';
-  }
-
-  private iSetVisibility(index: number, vis: any) {
-    const id = index - 1;
+  private iSetVisibility(id: number, vis: boolean) {
     this.mFunctionVis[id] = vis;
-    this.iApplyFormulaVisibilityColor(index);
     if (this.mPaused) this.draw();
   }
 
@@ -435,29 +470,33 @@ export default class Grapher {
   }
 
   private iRegisterEventListeners() {
-    this.mCanvas.onmousedown = (ev: any) => {
+    this.mCanvas.onmousedown = (ev) => {
       this.iMouseDown(ev);
     };
 
-    this.mCanvas.onmousemove = (ev: any) => {
+    this.mCanvas.onmousemove = (ev) => {
       this.iMouseMove(ev);
     };
 
-    this.mCanvas.onmouseup = (ev: any) => {
+    this.mCanvas.onmouseup = (ev) => {
       this.iMouseUp(ev);
     };
 
-    this.mCanvas.onmouseout = (ev: any) => {
+    this.mCanvas.onmouseout = (ev) => {
       this.iMouseUp(ev);
-    };
-
-    this.mCanvas.onwheel = (ev: any) => {
-      this.iMouseWheel(ev);
     };
 
     this.mCanvas.addEventListener(
+      'wheel',
+      (ev) => {
+        this.iMouseWheel(ev);
+      },
+      { passive: true },
+    );
+
+    this.mCanvas.addEventListener(
       'touchstart',
-      (e: any) => {
+      (e) => {
         e.preventDefault();
         if (this.mRangeType !== 2) return;
 
@@ -481,21 +520,21 @@ export default class Grapher {
           this.mRefMouseY = 0;
         }
       },
-      false,
+      { passive: true },
     );
 
     this.mCanvas.addEventListener(
       'touchend',
-      (e: any) => {
+      (e) => {
         e.preventDefault();
         this.mMouseFunction = 0;
       },
-      false,
+      { passive: true },
     );
 
     this.mCanvas.addEventListener(
       'touchmove',
-      (e: any) => {
+      (e) => {
         e.preventDefault();
         if (this.mRangeType !== 2) return;
         let touches = e.changedTouches;
@@ -522,7 +561,7 @@ export default class Grapher {
           if (this.mPaused) this.draw();
         }
       },
-      false,
+      { passive: true },
     );
 
     window.onresize = (ev) => {
@@ -530,14 +569,13 @@ export default class Grapher {
     };
   }
 
-  private iMouseUp(e: any) {
+  private iMouseUp(e: MouseEvent) {
     this.mMouseFunction = 0;
   }
 
-  private iMouseDown(e: any) {
-    if (!e) e = window.event;
+  private iMouseDown(e: MouseEvent) {
     if (this.mRangeType !== 2) return;
-    if (e.button === 0 && e.shiftKey === false) this.mMouseFunction = 1;
+    if (e.button === 0 && !e.shiftKey) this.mMouseFunction = 1;
     else this.mMouseFunction = 2;
     this.mRefCx = this.mCx;
     this.mRefCy = this.mCy;
@@ -546,8 +584,7 @@ export default class Grapher {
     this.mRefMouseY = e.offsetY;
   }
 
-  private iMouseMove(e: any) {
-    if (!e) e = window.event;
+  private iMouseMove(e: MouseEvent) {
     const cxres = this.mCanvas.offsetWidth;
     const cyres = this.mCanvas.offsetHeight;
 
@@ -556,9 +593,9 @@ export default class Grapher {
       const ry = (this.mRa * cyres) / cxres;
       const x = this.mCx + 2.0 * rx * (e.offsetX / cxres - 0.5);
       const y = this.mCy - 2.0 * ry * (e.offsetY / cyres - 0.5);
-      const n = 1 + Math.floor(Math.log(cxres / (rx * 2.0)) / Math.log(10.0));
-      document.getElementById('myCoords')!.innerHTML =
-        '(' + x.toFixed(n) + ', ' + y.toFixed(n) + ')';
+      // const n = 1 + Math.floor(Math.log(cxres / (rx * 2.0)) / Math.log(10.0));
+      this.onCoordUpdate(x, y);
+      this.mCoords = [x, y];
     }
 
     if (this.mRangeType !== 2) return;
@@ -588,11 +625,9 @@ export default class Grapher {
     }
   }
 
-  private iMouseWheel(e: any) {
-    if (!e) e = window.event;
-    const sfactor = 1.1;
-    const scale = e.deltaY < 0 || e.wheelDelta > 0 ? 1.0 / sfactor : sfactor;
-    e.preventDefault();
+  private iMouseWheel(e: WheelEvent) {
+    const sFactor = 1.1;
+    const scale = e.deltaY < 0 ? 1.0 / sFactor : sFactor;
     this.mRa = this.mRa * scale;
 
     if (this.mPaused) this.draw();
@@ -614,8 +649,36 @@ export default class Grapher {
     this.mYres = h;
   }
 
-  private iResize(e: any) {
+  private iResize(e: UIEvent) {
     this.iAdjustCanvas();
     if (this.mPaused) this.draw();
   }
+
+  /**
+   * Get the visualized functions in the correct channel order (RGB)
+   * @private
+   */
+  private iGetVisualizedFuncs() {
+    return [
+      this.mFunctionFun[this.mFunctionVisualizer[0]],
+      this.mFunctionFun[this.mFunctionVisualizer[1]],
+      this.mFunctionFun[this.mFunctionVisualizer[2]],
+    ];
+  }
+
+  /**
+   * This function is called each time the time updates and can be
+   * overwritten to act upon Grapher's internal state
+   * @private
+   */
+  private onTimeUpdate: OnTimeUpdate = noop;
+
+  /**
+   * This function is called each time the mouse coordinates update and can be
+   * overwritten to act upon Grapher's internal state
+   * @private
+   */
+  private onCoordUpdate: OnCoordUpdate = noop;
+
+  private onFormulaError: OnFormulaError = noop;
 }

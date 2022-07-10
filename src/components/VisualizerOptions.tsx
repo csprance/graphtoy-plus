@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import { useStore } from '../store';
 import { blue, green, red } from '../styles';
 
 const Wrapper = styled.div`
@@ -32,17 +33,19 @@ interface Props {
   r: boolean;
   g: boolean;
   b: boolean;
-  setVisualizers: () => void;
+  id: number;
 }
-const VisualizerOptions: React.FC<Props> = ({ r, g, b, setVisualizers }) => {
+const VisualizerOptions: React.FC<Props> = ({ r, g, b, id }) => {
+  const { setVisualizers } = useStore();
   const toggleOthersContextMenu = (e: React.MouseEvent<HTMLInputElement>) => {
     e.preventDefault();
+    setVisualizers(id, [true, true, true]);
   };
   return (
     <Wrapper>
       <MyCheckbox
         checked={r}
-        onChange={setVisualizers}
+        onChange={(e) => setVisualizers(id, [e.target.checked, g, b])}
         onContextMenu={toggleOthersContextMenu}
         color={red}
         type="checkbox"
@@ -50,7 +53,7 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b, setVisualizers }) => {
 
       <MyCheckbox
         checked={g}
-        onChange={setVisualizers}
+        onChange={(e) => setVisualizers(id, [r, e.target.checked, b])}
         onContextMenu={toggleOthersContextMenu}
         color={green}
         type="checkbox"
@@ -58,7 +61,7 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b, setVisualizers }) => {
 
       <MyCheckbox
         checked={b}
-        onChange={setVisualizers}
+        onChange={(e) => setVisualizers(id, [r, g, e.target.checked])}
         onContextMenu={toggleOthersContextMenu}
         color={blue}
         type="checkbox"

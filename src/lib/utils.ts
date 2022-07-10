@@ -1,3 +1,5 @@
+import { Formula } from '../store/Formulas';
+
 export function isNumber(s: string) {
   if (['-', '-.', '.', ''].includes(s)) {
     return true;
@@ -21,3 +23,9 @@ export const isBadNum = (num: number) =>
   num === Number.NEGATIVE_INFINITY ||
   num === Number.POSITIVE_INFINITY ||
   Math.abs(num) > 1e9;
+
+export const sortById = (a: Formula, b: Formula) =>
+  a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+
+export type Noop<T> = () => T;
+export const noop: Noop<any> = () => {};

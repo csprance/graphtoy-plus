@@ -1,4 +1,4 @@
-import { Formula } from '../store/Formulas';
+import { Formula } from './graphtoy/types';
 
 export function isNumber(s: string) {
   if (['-', '-.', '.', ''].includes(s)) {

@@ -1,31 +1,21 @@
-import { Formula, defaultFormulas } from '../../store/Formulas';
-import { Variable, defaultVariables } from '../../store/Variables';
-import { isBadNum, noop, sortById } from '../utils';
+import mitt from 'mitt';
+
+import { isBadNum } from '../utils';
 import {
-  GrapherTheme,
   darkTheme,
+  defaultFormulas,
+  defaultVariables,
   kBlackList,
   lightTheme,
   symbolSubs,
 } from './constants';
-
-type FncFormula = (x: number, t: number) => number;
-
-export type OnTimeUpdate = (t: number) => void;
-export type OnCoordUpdate = (x: number, y: number) => void;
-export type OnFormulaError = ({
-  error,
-  formula,
-}: {
-  error: string;
-  formula: Formula;
-}) => void;
-
-export interface GrapherOnEventFunctions {
-  onTimeUpdate: OnTimeUpdate;
-  onCoordUpdate: OnCoordUpdate;
-  onFormulaError: OnFormulaError;
-}
+import {
+  FncFormula,
+  Formula,
+  GrapherOnEventFunctions,
+  GrapherTheme,
+  Variable,
+} from './types';
 
 export default class Grapher {
   mCanvas!: HTMLCanvasElement;
@@ -51,41 +41,19 @@ export default class Grapher {
   mFormulas: Formula[] = defaultFormulas;
   mVariables: Variable[] = defaultVariables;
   mFunctionFun: Array<FncFormula | null> = [null, null, null, null, null, null];
-  mFunctionVis: boolean[] = [true, true, true, true, true, true];
   mFunctionVisualizer: [number, number, number] = [0, 1, 2];
   mXres: number = 0;
   mYres: number = 0;
   mShowVisualizer: boolean = true;
   mCoords: [number, number] = [0, 0];
+  events = mitt<GrapherOnEventFunctions>();
 
   public setCanvas(canvas: HTMLCanvasElement) {
     this.mCanvas = canvas;
     this.mContext = this.mCanvas.getContext('2d')!;
   }
 
-  public registerCoordListener(onCoordUpdateFn: OnCoordUpdate) {
-    this.onCoordUpdate = onCoordUpdateFn;
-  }
-
-  public registerTimeListener(onTimeUpdateFn: OnTimeUpdate) {
-    this.onTimeUpdate = onTimeUpdateFn;
-  }
-
-  public registerErrorListener(onFormulaError: OnFormulaError) {
-    this.onFormulaError = onFormulaError;
-  }
-
-  public start(
-    config: GrapherOnEventFunctions = {
-      onCoordUpdate: noop,
-      onTimeUpdate: noop,
-      onFormulaError: noop,
-    },
-  ) {
-    this.onTimeUpdate = config.onTimeUpdate;
-    this.onCoordUpdate = config.onCoordUpdate;
-    this.onFormulaError = config.onFormulaError;
-
+  public start() {
     this.iRegisterEventListeners();
     // Compile all of our formulas
     this.mFormulas.forEach((val, idx) => {
@@ -209,27 +177,23 @@ export default class Grapher {
         continue;
       }
       if (!Grapher.iNotOnBlackList(strFormula)) continue;
-
       // Draw the Graph if it's enabled
-      if (this.mFunctionVis[formula.id]) {
+      if (formula.enabled) {
         this.iDrawGraph(formula.id, theme.mGraphs[formula.id]);
       }
     }
   }
 
-  public getFormulas() {
-    return this.mFormulas.sort(sortById);
-  }
+  public resetTime(t = 0.0) {
+    this.mTimeMS = t;
+    this.mTimeS = t;
+    this.mStartMS = t;
+    this.mOffsetMS = t;
 
-  public resetTime() {
-    this.mTimeMS = 0;
-    this.mTimeS = 0.0;
-    this.mStartMS = 0;
-    this.mOffsetMS = 0;
     if (this.mPaused) {
       this.draw();
     }
-    this.onTimeUpdate(0);
+    this.events.emit('time', t);
   }
 
   public togglePlay() {
@@ -243,7 +207,7 @@ export default class Grapher {
         this.mTimeMS = this.mOffsetMS + (time - this.mStartMS);
         this.mTimeS = this.mTimeMS / 1000.0;
         this.draw();
-        this.onTimeUpdate(this.mTimeS);
+        this.events.emit('time', this.mTimeS);
         if (!this.mPaused) requestAnimationFrame(update);
       };
       requestAnimationFrame(update);
@@ -259,7 +223,7 @@ export default class Grapher {
    * Complete replace the formulas with whatever is passed in
    */
   public setFormulas(formulas: Formula[], recompile = false) {
-    console.log('Setting Formulas');
+    // console.log('Setting Formulas');
     this.mFormulas = formulas;
     if (recompile) this.recompileAllFormulas();
     if (this.mPaused) this.draw();
@@ -293,12 +257,6 @@ export default class Grapher {
   public toggleTheme() {
     this.mTheme = 1 - this.mTheme;
     if (this.mPaused) this.draw();
-  }
-
-  public toggleVisibility(index: number) {
-    const id = index - 1;
-    const vis = this.mFunctionVis[id];
-    this.iSetVisibility(index, !vis);
   }
 
   public toggleShowAxes() {
@@ -366,9 +324,10 @@ export default class Grapher {
     try {
       fnFormula(0.1, 0.2);
     } catch (err) {
-      // TODO: Show the user this error here
-      this.onFormulaError({ error: err as string, formula: formulas[id] });
-      console.log(err);
+      this.events.emit('formulaError', {
+        error: err as string,
+        formula: formulas[id],
+      });
       return;
     }
 
@@ -394,7 +353,7 @@ export default class Grapher {
     const ry = (this.mRa * this.mYres) / this.mXres;
     const t = this.mTimeS;
 
-    // Evaluate the function at the x resolution value specified and move along the path it creates
+    // Evaluate the function at the x value specified and move along the path it creates
     ctx.beginPath();
     for (let i = 0; i < this.mXres; i++) {
       const x = this.mCx + rx * (-1.0 + (2.0 * i) / this.mXres);
@@ -445,11 +404,6 @@ export default class Grapher {
       ctx.fillStyle = gradient;
       ctx.fillRect(20, 20, 200, 200);
     }
-  }
-
-  private iSetVisibility(id: number, vis: boolean) {
-    this.mFunctionVis[id] = vis;
-    if (this.mPaused) this.draw();
   }
 
   private static iNotOnBlackList(formula: any) {
@@ -594,7 +548,7 @@ export default class Grapher {
       const x = this.mCx + 2.0 * rx * (e.offsetX / cxres - 0.5);
       const y = this.mCy - 2.0 * ry * (e.offsetY / cyres - 0.5);
       // const n = 1 + Math.floor(Math.log(cxres / (rx * 2.0)) / Math.log(10.0));
-      this.onCoordUpdate(x, y);
+      this.events.emit('coords', [x, y]);
       this.mCoords = [x, y];
     }
 
@@ -665,20 +619,4 @@ export default class Grapher {
       this.mFunctionFun[this.mFunctionVisualizer[2]],
     ];
   }
-
-  /**
-   * This function is called each time the time updates and can be
-   * overwritten to act upon Grapher's internal state
-   * @private
-   */
-  private onTimeUpdate: OnTimeUpdate = noop;
-
-  /**
-   * This function is called each time the mouse coordinates update and can be
-   * overwritten to act upon Grapher's internal state
-   * @private
-   */
-  private onCoordUpdate: OnCoordUpdate = noop;
-
-  private onFormulaError: OnFormulaError = noop;
 }

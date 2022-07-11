@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import { Formula } from '../lib/graphtoy/types';
 import { useStore } from '../store';
-import { Formula } from '../store/Formulas';
 import VisualizerOptions from './VisualizerOptions';
 
 const Wrapper = styled.div`
@@ -19,20 +19,19 @@ const FormulaComponent: React.FC<Props> = ({
   formula: { id, value, visualizer, enabled },
 }) => {
   const [r, g, b] = visualizer;
-  const [_enabled, setEnabled] = React.useState(true);
-  const { setFormulaValue, formulaColors, grapher } = useStore();
+  const { setFormulaValue, formulaColors, toggleFormulaVisibility } =
+    useStore();
 
   return (
     <Wrapper>
       <div
         id={`f${id}`}
         onClick={() => {
-          setEnabled(!enabled);
-          grapher?.toggleVisibility(id);
+          toggleFormulaVisibility(id);
         }}
         style={{
           cursor: 'pointer',
-          color: _enabled ? formulaColors[id - 1] : '#808080',
+          color: enabled ? formulaColors[id] : '#808080',
         }}
       >
         f<sub>{id}</sub>(x,t) = &nbsp;

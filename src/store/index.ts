@@ -2,16 +2,15 @@ import produce from 'immer';
 import create from 'zustand';
 
 import Grapher from '../lib/graphtoy';
-import { makeMapPartialByID, sortById } from '../lib/utils';
 import {
-  Formula,
-  VisualizerState,
   defaultFormulas,
+  defaultVariables,
   exampleFormulas1,
   exampleFormulas2,
   exampleFormulas3,
-} from './Formulas';
-import { Variable, defaultVariables } from './Variables';
+} from '../lib/graphtoy/constants';
+import { Formula, Variable, VisualizerState } from '../lib/graphtoy/types';
+import { makeMapPartialByID, sortById } from '../lib/utils';
 
 export interface State {
   // An array of all the formulas displayed on the graph

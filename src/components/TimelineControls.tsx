@@ -1,34 +1,48 @@
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { useStore } from '../store';
-import PauseIcon from './PauseIcon';
-import PlayIcon from './PlayIcon';
-import ResetIcon from './ResetIcon';
+import Button from './Button';
+import Coords from './Coords';
+import Time from './Time';
+import TimelineBar from './TimelineBar';
+import PauseIcon from './icons/PauseIcon';
+import PlayIcon from './icons/PlayIcon';
+import ResetIcon from './icons/ResetIcon';
+
+const Wrapper = styled.div`
+  max-height: 50px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 150px auto 150px 80px 80px;
+  align-items: center;
+  padding-top: 8px;
+`;
 
 interface Props {}
 const TimelineControls: React.FC<Props> = () => {
   const { grapher } = useStore();
   const [paused, setPaused] = React.useState(false);
-  return (
-    <>
-      <div
-        className="userInputButtonsMedium"
-        style={{ marginRight: 12 }}
-        onClick={() => grapher.resetTime()}
-      >
-        <ResetIcon />
-      </div>
 
-      <div
-        className="userInputButtonsMedium"
+  return (
+    <Wrapper>
+      <Coords />
+      <TimelineBar />
+      <Time />
+
+      <Button onClick={() => grapher.resetTime()}>
+        <ResetIcon />
+      </Button>
+
+      <Button
         onClick={() => {
           setPaused(!paused);
           grapher.togglePlay();
         }}
       >
         {paused ? <PlayIcon /> : <PauseIcon />}
-      </div>
-    </>
+      </Button>
+    </Wrapper>
   );
 };
 

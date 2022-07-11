@@ -1,9 +1,7 @@
 import * as React from 'react';
 
-import { useStore } from '../store';
-import Coords from './Coords';
+import {useStore} from '../store';
 import Grapher from './Grapher';
-import Time from './Time';
 import TimelineControls from './TimelineControls';
 
 interface Props {}
@@ -91,13 +89,7 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
 
       <Grapher />
 
-      <div id="formulaParamBar">
-        <Coords />
-
-        <Time />
-
-        <TimelineControls />
-      </div>
+      <TimelineControls />
     </div>
   );
 };

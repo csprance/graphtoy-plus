@@ -2,9 +2,9 @@ import * as React from 'react';
 import { ChangeEvent } from 'react';
 import styled from 'styled-components';
 
+import { Variable } from '../lib/graphtoy/types';
 import { isNumber } from '../lib/utils';
 import { useStore } from '../store';
-import { Variable } from '../store/Variables';
 import RangeSlider from './RangeSlider';
 
 const Wrapper = styled.div`

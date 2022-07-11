@@ -8,14 +8,18 @@ const Time: React.FC<Props> = () => {
   const timeRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (timeRef.current) {
-      grapher.registerTimeListener((x) => {
-        timeRef.current!.innerText = `t = ${x.toFixed(2)}`;
-      });
+      const handler = (t: number) => {
+        timeRef.current!.innerText = `t = ${t.toFixed(2)}`;
+      };
+      grapher.events.on('time', handler);
+      return () => {
+        grapher.events.off('time', handler);
+      };
     }
   }, [grapher]);
 
   return (
-    <div ref={timeRef} style={{ width: 102 }}>
+    <div ref={timeRef} style={{ textAlign: 'center' }}>
       t = 0.0
     </div>
   );

@@ -3,6 +3,7 @@ import * as React from 'react';
 import Formulas from './Formulas';
 import FunctionButtons from './FunctionButtons';
 import Variables from './Variables';
+import Notes from './Notes';
 
 interface Props {}
 const Gui: React.FC<Props> = () => {
@@ -25,6 +26,7 @@ const Gui: React.FC<Props> = () => {
           <li>Use Mouse Wheel to zoom on current viewport center</li>
         </ul>
       </div>
+      {/*<Notes />*/}
     </>
   );
 };

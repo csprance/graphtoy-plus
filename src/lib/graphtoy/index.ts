@@ -292,14 +292,12 @@ export default class Grapher {
     const { id } = formula;
     const formulas = this.mFormulas;
     const strFormula = formula.value;
-    //
-    // this.mFunctionFun[formula.id] = null;
+    this.mFunctionFun[formula.id] = null;
 
     if (strFormula == null) return false;
     if (strFormula === '') return false;
     if (!this.iNotOnBlackList(formula)) return false;
 
-    // console.log(`Compiling ${id}`);
     // Compile our functions in to one function
     let fncString = 'with(Math){';
     if (id >= 0)

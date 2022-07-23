@@ -13,6 +13,10 @@ import { Formula, Variable, VisualizerState } from '../lib/graphtoy/types';
 import { makeMapPartialByID, sortById } from '../lib/utils';
 
 export const useStore = create<MyStore>()((set, get) => ({
+  // /////////////////////////////
+  // Notes
+  notes: '',
+  setNotes: (notes) => set({ notes }),
   // ////////////////////////////
   // Grapher
   grapher: new Grapher(),
@@ -91,6 +95,7 @@ export const useStore = create<MyStore>()((set, get) => ({
     const url = new URL(window.location.href);
     url.searchParams.set('variables', JSON.stringify(state.variables));
     url.searchParams.set('formulas', JSON.stringify(state.formulas));
+    url.searchParams.set('notes', JSON.stringify(state.notes));
     // Push it to clipboard and set it as the current URL
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url.toString()).then(
@@ -109,9 +114,19 @@ export const useStore = create<MyStore>()((set, get) => ({
     const url = new URL(window.location.href);
     const variables = url.searchParams.get('variables');
     const formulas = url.searchParams.get('formulas');
-    if (formulas && variables) {
+    const notes = url.searchParams.get('notes');
+    if (formulas) {
       set({
         formulas: JSON.parse(formulas),
+      });
+    }
+    if (notes) {
+      set({
+        notes: JSON.parse(notes),
+      });
+    }
+    if (variables) {
+      set({
         variables: JSON.parse(variables),
       });
     }
@@ -133,6 +148,7 @@ export const useStore = create<MyStore>()((set, get) => ({
 }));
 
 export interface State {
+  notes: string;
   // The main class that handles rendering the graph
   grapher: Grapher;
   // An array of all the formulas displayed on the graph
@@ -144,6 +160,11 @@ export interface State {
 }
 
 export interface Actions {
+  /**
+   * Sets the notes on the current graph
+   * @param notes
+   */
+  setNotes: (notes: string) => void;
   /**
    * Set the formula value based on an index
    * @param id

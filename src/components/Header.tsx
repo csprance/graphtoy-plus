@@ -1,7 +1,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
+
 import packageJSON from '../../package.json';
-import {ctrlColorHover, linkColor} from "../styles";
+
 const Wrapper = styled.div``;
 const Title = styled.h1`
   margin-right: 5px;
@@ -19,18 +20,26 @@ interface Props {}
 const Header: React.FC<Props> = () => {
   return (
     <Wrapper>
-      <Title>Graphtoy<span style={{color: 'skyblue'}}>+</span> v{packageJSON.version}</Title>
+      <Title>
+        Graphtoy<span style={{ color: 'skyblue' }}>+</span> v
+        {packageJSON.version}
+      </Title>
       <span>
         by <a href="https://iquilezles.org/">Inigo Quilez</a> (feedback from
         Rafæl Couto, Florian Mosleh, Nicholas Ralabate and Rich Eakin,
         Graphtoy-Plus extras by
         <a href="https://csprance.com"> Chris Sprance</a>). If you find Graphtoy
         useful, please consider supporting it by donating through my
-        <BubbleLink color={'#ff424d'} href="https://www.patreon.com/inigoquilez">
+        <BubbleLink
+          color={'#ff424d'}
+          href="https://www.patreon.com/inigoquilez"
+        >
           Patreon
         </BubbleLink>
         or
-        <BubbleLink color={'#0070ba'} href="http://paypal.me/inigoquilez">PayPal</BubbleLink>
+        <BubbleLink color={'#0070ba'} href="http://paypal.me/inigoquilez">
+          PayPal
+        </BubbleLink>
       </span>
     </Wrapper>
   );

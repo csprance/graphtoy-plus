@@ -5,8 +5,10 @@
   "dependencies": {
     "immer": "^9.0.15",
     "mitt": "^3.0.0",
+    "prismjs": "^1.28.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-simple-code-editor": "^0.11.2",
     "serve": "^13.0.2",
     "styled-components": "^5.3.5",
     "zustand": "^4.0.0-rc.1"
@@ -45,6 +47,7 @@
     "@trivago/prettier-plugin-sort-imports": "3.2.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.41",
+    "@types/prismjs": "^1.26.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
     "@types/styled-components": "^5.1.25",

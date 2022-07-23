@@ -1,10 +1,13 @@
+import { highlight, languages } from 'prismjs';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';
 import * as React from 'react';
+import Editor from 'react-simple-code-editor';
 import styled from 'styled-components';
 
 import { Formula } from '../lib/graphtoy/types';
 import { useStore } from '../store';
 import VisualizerOptions from './VisualizerOptions';
-import { ctrlColor } from '../styles';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -12,12 +15,9 @@ const Wrapper = styled.div`
   grid-template-columns: 80px auto 150px;
   padding-bottom: 4px;
 `;
-const FormulaInputField = styled.input<{ error: boolean }>`
+const FormulaInputField = styled(Editor)<{ error: boolean }>`
   width: 100%;
-  border-color: ${({ error }) => (error ? 'red' : 'transparent')};
-  :focus {
-    outline: ${ctrlColor} solid 2px;
-  }
+  border: ${({ error }) => (error ? 'red' : 'transparent')} 2px solid;
 `;
 interface Props {
   formula: Formula;
@@ -27,22 +27,17 @@ const FormulaComponent: React.FC<Props> = ({
 }) => {
   const [error, setError] = React.useState('');
   const [r, g, b] = visualizer;
-  const {
-    setFormulaValue,
-    formulaColors,
-    toggleFormulaVisibility,
-    grapher,
-  } = useStore();
+  const { setFormulaValue, formulaColors, toggleFormulaVisibility, grapher } =
+    useStore();
   // Handle our Errors here
   React.useEffect(() => {
     grapher.events.on('formulaError', (err) => {
       if (err.formula.id === id) {
-          if(err.error.startsWith('Unexpected token ')){
-              setError('Failed to parse expression.');
-          } else {
-              setError(err.error);
-          }
-
+        if (err.error.startsWith('Unexpected token ')) {
+          setError('Failed to parse expression.');
+        } else {
+          setError(err.error);
+        }
       }
     });
     grapher.events.on('formulaCompiled', (_id) => {
@@ -68,16 +63,16 @@ const FormulaComponent: React.FC<Props> = ({
       </div>
       <div style={{ width: '100%' }}>
         <FormulaInputField
-          error={!!error}
-          type="text"
-          autoCorrect="off"
-          spellCheck={false}
-          autoCapitalize="none"
-          className="userInput"
-          name={`formula${id}`}
-          id={`formula${id}`}
           value={value}
-          onChange={(e) => setFormulaValue(id, e.target.value)}
+          error={!!error}
+          onValueChange={(code) => setFormulaValue(id, code)}
+          highlight={(code) => highlight(code, languages.js, 'javascript')}
+          padding={10}
+          className="userInput"
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+          }}
         />
         {error}
       </div>

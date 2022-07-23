@@ -641,9 +641,9 @@ export default class Grapher {
    */
   private iGetVisualizedFuncs() {
     // Iterate through all the formulas find the id of the first red,green,blue channel formula
-    const r = this.mFormulas.find((f) => f.visualizer[0])
-    const g = this.mFormulas.find((f) => f.visualizer[1])
-    const b = this.mFormulas.find((f) => f.visualizer[2])
+    const r = this.mFormulas.find((f) => f.visualizer[0]);
+    const g = this.mFormulas.find((f) => f.visualizer[1]);
+    const b = this.mFormulas.find((f) => f.visualizer[2]);
     return [
       r ? this.mFunctionFun[this.mFunctionVisualizer[r.id]] : null,
       g ? this.mFunctionFun[this.mFunctionVisualizer[g.id]] : null,

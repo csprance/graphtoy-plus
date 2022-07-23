@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {useStore} from '../store';
+import { useStore } from '../store';
 import Grapher from './Grapher';
 import TimelineControls from './TimelineControls';
 

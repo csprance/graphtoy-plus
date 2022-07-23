@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { MyMath } from '../lib/graphtoy/lib';
+import { OnPlayPauseFn, OnTimeUpdateFn } from '../lib/graphtoy/types';
 import { useStore } from '../store';
 import RangeSlider from './RangeSlider';
 
@@ -8,18 +9,26 @@ interface Props {}
 const TimelineBar: React.FC<Props> = () => {
   const { grapher } = useStore();
   const [t, setT] = React.useState(grapher.mTimeS);
+  const [paused, setPaused] = React.useState(false);
+
   React.useEffect(() => {
-    const handler = (t: number) => {
+    const timeHandle: OnTimeUpdateFn = (t) => {
       setT(t);
     };
-    grapher.events.on('time', handler);
+    const pauseHandle: OnPlayPauseFn = (p) => {
+      setPaused(p);
+    };
+    grapher.events.on('playPause', pauseHandle);
+    grapher.events.on('time', timeHandle);
     return () => {
-      grapher.events.off('time', handler);
+      grapher.events.off('playPause', pauseHandle);
+      grapher.events.off('time', timeHandle);
     };
   }, [grapher]);
 
   return (
     <RangeSlider
+      disabled={!paused}
       min={0}
       max={MyMath.clamp(t + 150, 0, 1500)}
       value={t}

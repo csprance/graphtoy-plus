@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { OnCoordUpdateFn } from '../lib/graphtoy/types';
 import { useStore } from '../store';
 
 interface Props {}
@@ -8,7 +9,7 @@ const Coords: React.FC<Props> = () => {
   const coordRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (coordRef.current) {
-      const handler = ([x, y]: [number, number]) => {
+      const handler: OnCoordUpdateFn = ([x, y]) => {
         coordRef.current!.innerText = `${x.toFixed(2)}, ${y.toFixed(2)}`;
       };
       grapher.events.on('coords', handler);
@@ -19,7 +20,7 @@ const Coords: React.FC<Props> = () => {
   }, [grapher]);
 
   return (
-    <div style={{ textAlign: 'center' }} ref={coordRef}>
+    <div style={{ textAlign: 'left' }} ref={coordRef}>
       0, 0
     </div>
   );

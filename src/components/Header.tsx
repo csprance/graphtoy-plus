@@ -1,47 +1,38 @@
 import * as React from 'react';
-
+import styled from 'styled-components';
+import packageJSON from '../../package.json';
+import {ctrlColorHover, linkColor} from "../styles";
+const Wrapper = styled.div``;
+const Title = styled.h1`
+  margin-right: 5px;
+`;
+const BubbleLink = styled.a`
+  background-color: ${({ color }) => color};
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  margin-left: 5px;
+  margin-right: 5px;
+`;
 interface Props {}
 const Header: React.FC<Props> = () => {
   return (
-    <div className="ml">
-      <h1>Graphtoy + v0.4.1</h1>
-      by <a href="https://iquilezles.org/">Inigo Quilez</a> (feedback from Rafæl
-      Couto, Florian Mosleh, Nicholas Ralabate and Rich Eakin, extras by Chris
-      Sprance). If you find Graphtoy useful, please consider supporting it by
-      donating through my
-      <a
-        href="https://www.patreon.com/inigoquilez"
-        style={{
-          backgroundColor: '#ff424d',
-          paddingLeft: 12,
-          paddingRight: 12,
-          color: '#ffffff',
-          paddingTop: 4,
-          paddingBottom: 4,
-          borderRadius: 12,
-          fontWeight: 'bold',
-        }}
-      >
-        Patreon
-      </a>
-      or
-      <a
-        href="http://paypal.me/inigoquilez"
-        style={{
-          backgroundColor: '#0070ba',
-          paddingLeft: 12,
-          paddingRight: 12,
-          color: '#ffffff',
-          paddingTop: 4,
-          paddingBottom: 4,
-          borderRadius: 12,
-          fontWeight: 'bold',
-        }}
-      >
-        PayPal
-      </a>
-      .
-    </div>
+    <Wrapper>
+      <Title>Graphtoy<span style={{color: 'skyblue'}}>+</span> v{packageJSON.version}</Title>
+      <span>
+        by <a href="https://iquilezles.org/">Inigo Quilez</a> (feedback from
+        Rafæl Couto, Florian Mosleh, Nicholas Ralabate and Rich Eakin,
+        Graphtoy-Plus extras by
+        <a href="https://csprance.com"> Chris Sprance</a>). If you find Graphtoy
+        useful, please consider supporting it by donating through my
+        <BubbleLink color={'#ff424d'} href="https://www.patreon.com/inigoquilez">
+          Patreon
+        </BubbleLink>
+        or
+        <BubbleLink color={'#0070ba'} href="http://paypal.me/inigoquilez">PayPal</BubbleLink>
+      </span>
+    </Wrapper>
   );
 };
 

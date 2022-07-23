@@ -1,5 +1,6 @@
 export type FncFormula = (x: number, t: number) => number;
 
+export type OnPlayPauseFn = (paused: boolean) => void;
 export type OnTimeUpdateFn = (t: number) => void;
 export type OnCoordUpdateFn = ([x, y]: [number, number]) => void;
 export type OnFormulaErrorFn = ({
@@ -11,6 +12,8 @@ export type OnFormulaErrorFn = ({
 }) => void;
 
 export type GrapherOnEventFunctions = {
+  playPause: boolean;
+  formulaCompiled: number; // The ID
   time: number;
   coords: [number, number];
   formulaError: { error: any; formula: Formula };

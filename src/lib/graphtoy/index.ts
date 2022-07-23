@@ -1,6 +1,6 @@
 import mitt from 'mitt';
 
-import { isBadNum } from '../utils';
+import { getErrorMessage, isBadNum } from '../utils';
 import {
   darkTheme,
   defaultFormulas,
@@ -48,20 +48,124 @@ export default class Grapher {
   mCoords: [number, number] = [0, 0];
   events = mitt<GrapherOnEventFunctions>();
 
+  /**
+   * Set the canvas so grapher has something to work with. This must be done first
+   * @param canvas
+   */
   public setCanvas(canvas: HTMLCanvasElement) {
     this.mCanvas = canvas;
     this.mContext = this.mCanvas.getContext('2d')!;
   }
 
+  /**
+   * Start Grapher off doing it's graphing thing. setCanvas must have been called first.
+   */
   public start() {
     this.iRegisterEventListeners();
     // Compile all of our formulas
-    this.mFormulas.forEach((val, idx) => {
-      this.iCompile(idx);
+    this.mFormulas.forEach((formula) => {
+      this.compileFormula(formula);
     });
     this.iAdjustCanvas();
     this.togglePlay();
     this.draw();
+  }
+
+  /**
+   * Reset the time to 0 or an optionally provided t value
+   * @param t 0 if not provided
+   */
+  public resetTime(t = 0.0) {
+    this.mTimeMS = t;
+    this.mTimeS = t;
+    this.mStartMS = t;
+    this.mOffsetMS = t;
+
+    if (this.mPaused) {
+      this.draw();
+    }
+    this.events.emit('time', t);
+  }
+
+  public togglePlay() {
+    this.mPaused = !this.mPaused;
+    this.events.emit('playPause', this.mPaused);
+
+    if (!this.mPaused) {
+      this.mStartMS = 0;
+      this.mOffsetMS = this.mTimeMS;
+      const update = (time: number) => {
+        if (this.mStartMS === 0) this.mStartMS = time;
+        this.mTimeMS = this.mOffsetMS + (time - this.mStartMS);
+        this.mTimeS = this.mTimeMS / 1000.0;
+        this.draw();
+        this.events.emit('time', this.mTimeS);
+        if (!this.mPaused) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+  }
+
+  public toggleVisualizer() {
+    this.mShowVisualizer = !this.mShowVisualizer;
+    this.draw();
+  }
+
+  /**
+   * Complete replace the formulas with whatever is passed in
+   * @param formulas
+   * @param recompile
+   */
+  public setFormulas(formulas: Formula[], recompile = false) {
+    this.mFormulas = formulas;
+    if (recompile) this.recompileAllFormulas();
+    if (this.mPaused) this.draw();
+  }
+
+  public setVariables(variables: Variable[], recompile = false) {
+    this.mVariables = variables;
+    if (recompile) this.recompileAllFormulas();
+    if (this.mPaused) this.draw();
+  }
+
+  /**
+   * Just update a single Formula by an ID
+   * @param id The formula ID to update
+   * @param formula The Formula to update it with
+   */
+  public updateFormulaById(id: number, formula: Formula) {
+    this.mFormulas[id] = formula;
+    // Update all the formulas after the id
+    this.recompileAllFormulas();
+  }
+
+  public recompileAllFormulas() {
+    for (const formula of this.mFormulas) {
+      if (!this.compileFormula(formula)) {
+        return;
+      }
+    }
+  }
+
+  public toggleTheme() {
+    this.mTheme = 1 - this.mTheme;
+    if (this.mPaused) this.draw();
+  }
+
+  public toggleShowAxes() {
+    this.mShowAxes = (this.mShowAxes + 1) % 3;
+    if (this.mPaused) this.draw();
+  }
+
+  public toggleRange() {
+    this.mRangeType = (this.mRangeType + 1) % 3;
+    if (this.mPaused) this.draw();
+  }
+
+  public resetCoords() {
+    this.mCx = 0.0;
+    this.mCy = 0.0;
+    this.mRa = 12.0;
   }
 
   public draw() {
@@ -176,7 +280,7 @@ export default class Grapher {
       if (strFormula == null || strFormula === '') {
         continue;
       }
-      if (!Grapher.iNotOnBlackList(strFormula)) continue;
+      // if (!this.iNotOnBlackList(formula)) continue;
       // Draw the Graph if it's enabled
       if (formula.enabled) {
         this.iDrawGraph(formula.id, theme.mGraphs[formula.id]);
@@ -184,106 +288,16 @@ export default class Grapher {
     }
   }
 
-  public resetTime(t = 0.0) {
-    this.mTimeMS = t;
-    this.mTimeS = t;
-    this.mStartMS = t;
-    this.mOffsetMS = t;
-
-    if (this.mPaused) {
-      this.draw();
-    }
-    this.events.emit('time', t);
-  }
-
-  public togglePlay() {
-    this.mPaused = !this.mPaused;
-
-    if (!this.mPaused) {
-      this.mStartMS = 0;
-      this.mOffsetMS = this.mTimeMS;
-      const update = (time: number) => {
-        if (this.mStartMS === 0) this.mStartMS = time;
-        this.mTimeMS = this.mOffsetMS + (time - this.mStartMS);
-        this.mTimeS = this.mTimeMS / 1000.0;
-        this.draw();
-        this.events.emit('time', this.mTimeS);
-        if (!this.mPaused) requestAnimationFrame(update);
-      };
-      requestAnimationFrame(update);
-    }
-  }
-
-  public toggleVisualizer() {
-    this.mShowVisualizer = !this.mShowVisualizer;
-    this.draw();
-  }
-
-  /**
-   * Complete replace the formulas with whatever is passed in
-   */
-  public setFormulas(formulas: Formula[], recompile = false) {
-    // console.log('Setting Formulas');
-    this.mFormulas = formulas;
-    if (recompile) this.recompileAllFormulas();
-    if (this.mPaused) this.draw();
-  }
-
-  public setVariables(variables: Variable[], recompile = false) {
-    // console.log('Setting Variable');
-    this.mVariables = variables;
-    if (recompile) this.recompileAllFormulas();
-    if (this.mPaused) this.draw();
-  }
-
-  /**
-   * Just update a single Formula by an ID
-   * @param id The formula ID to update
-   * @param formula The Formula to update it with
-   */
-  public updateFormulaById(id: number, formula: Formula) {
-    // console.log('Updating one');
-    this.mFormulas[id] = formula;
-    // Update all the formulas after the id
-    this.recompileAllFormulas();
-  }
-
-  public recompileAllFormulas() {
-    for (const formula of this.mFormulas) {
-      this.iCompile(formula.id);
-    }
-  }
-
-  public toggleTheme() {
-    this.mTheme = 1 - this.mTheme;
-    if (this.mPaused) this.draw();
-  }
-
-  public toggleShowAxes() {
-    this.mShowAxes = (this.mShowAxes + 1) % 3;
-    if (this.mPaused) this.draw();
-  }
-
-  public toggleRange() {
-    this.mRangeType = (this.mRangeType + 1) % 3;
-    if (this.mPaused) this.draw();
-  }
-
-  public resetCoords() {
-    this.mCx = 0.0;
-    this.mCy = 0.0;
-    this.mRa = 12.0;
-  }
-
-  private iCompile(id: number) {
+  public compileFormula(formula: Formula, storeFunc = true): boolean {
+    const { id } = formula;
     const formulas = this.mFormulas;
-    const strFormula = formulas[id].value;
+    const strFormula = formula.value;
+    //
+    // this.mFunctionFun[formula.id] = null;
 
-    this.mFunctionFun[id] = null;
-
-    if (strFormula == null) return;
-    if (strFormula === '') return;
-    if (!Grapher.iNotOnBlackList(strFormula)) return;
+    if (strFormula == null) return false;
+    if (strFormula === '') return false;
+    if (!this.iNotOnBlackList(formula)) return false;
 
     // console.log(`Compiling ${id}`);
     // Compile our functions in to one function
@@ -319,20 +333,29 @@ export default class Grapher {
       // eslint-disable-next-line no-new-func
       fnFormula = Function('x,t', fncString) as FncFormula;
     } catch (err) {
-      return;
+      this.events.emit('formulaError', {
+        error: getErrorMessage(err),
+        formula,
+      });
+      return false;
     }
     try {
       fnFormula(0.1, 0.2);
     } catch (err) {
       this.events.emit('formulaError', {
-        error: err as string,
-        formula: formulas[id],
+        error: getErrorMessage(err),
+        formula,
       });
-      return;
+      return false;
     }
 
     // Set the compiled function to be used later
-    this.mFunctionFun[id] = fnFormula;
+    if (storeFunc) {
+      this.mFunctionFun[id] = fnFormula;
+      this.events.emit('formulaCompiled', id);
+    }
+
+    return true;
   }
 
   /**
@@ -361,6 +384,10 @@ export default class Grapher {
       try {
         y = formula(x, t);
       } catch (err) {
+        this.events.emit('formulaError', {
+          error: getErrorMessage(err),
+          formula: this.mFormulas[id],
+        });
         success = false;
         break;
       }
@@ -406,17 +433,18 @@ export default class Grapher {
     }
   }
 
-  private static iNotOnBlackList(formula: any) {
-    if (formula.length > 256) {
-      // TODO: Maybe use something other than alert here
-      alert('Formula is too long...');
+  private iNotOnBlackList(formula: Formula) {
+    if (formula.value.length > 256) {
+      this.events.emit('formulaError', {
+        error: 'Formula is too long...',
+        formula,
+      });
       return false;
     }
-    const lowFormula = formula.toLowerCase();
+    const lowFormula = formula.value.toLowerCase();
     for (let n = 0; n < kBlackList.length; n++) {
       if (lowFormula.indexOf(kBlackList[n]) !== -1) {
-        // TODO: Show the user this error
-        console.log('Forbidden word');
+        this.events.emit('formulaError', { error: 'Forbidden Word', formula });
         return false;
       }
     }
@@ -609,14 +637,19 @@ export default class Grapher {
   }
 
   /**
-   * Get the visualized functions in the correct channel order (RGB)
+   * Derive the visualized functions in the correct channel order (RGB)
+   * based on all the formulas in mFormulas
    * @private
    */
   private iGetVisualizedFuncs() {
+    // Iterate through all the formulas find the id of the first red,green,blue channel formula
+    const r = this.mFormulas.find((f) => f.visualizer[0])
+    const g = this.mFormulas.find((f) => f.visualizer[1])
+    const b = this.mFormulas.find((f) => f.visualizer[2])
     return [
-      this.mFunctionFun[this.mFunctionVisualizer[0]],
-      this.mFunctionFun[this.mFunctionVisualizer[1]],
-      this.mFunctionFun[this.mFunctionVisualizer[2]],
+      r ? this.mFunctionFun[this.mFunctionVisualizer[r.id]] : null,
+      g ? this.mFunctionFun[this.mFunctionVisualizer[g.id]] : null,
+      b ? this.mFunctionFun[this.mFunctionVisualizer[b.id]] : null,
     ];
   }
 }

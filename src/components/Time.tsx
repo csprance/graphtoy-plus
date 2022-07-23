@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { OnTimeUpdateFn } from '../lib/graphtoy/types';
 import { useStore } from '../store';
 
 interface Props {}
@@ -8,7 +9,7 @@ const Time: React.FC<Props> = () => {
   const timeRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (timeRef.current) {
-      const handler = (t: number) => {
+      const handler: OnTimeUpdateFn = (t) => {
         timeRef.current!.innerText = `t = ${t.toFixed(2)}`;
       };
       grapher.events.on('time', handler);

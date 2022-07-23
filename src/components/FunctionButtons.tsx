@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { useStore } from '../store';
-
 interface Props {}
 const FunctionButtons: React.FC<Props> = () => {
-  const { inject } = useStore();
+  const inject = (value: string) => {
+    document.execCommand('insertText', false, value);
+  };
   return (
     <div className="guiWindow">
       <div className="uiFuncPanel">

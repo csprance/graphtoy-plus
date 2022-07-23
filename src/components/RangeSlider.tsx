@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { ctrlColor, ctrlColorHover, inputBg } from '../styles';
+import { ctrlColor, ctrlColorHover, inputBg, inputBgDisabled } from '../styles';
 
 const SliderInput = styled.input`
   appearance: none;
@@ -33,6 +33,11 @@ const SliderInput = styled.input`
       background: ${ctrlColorHover};
     }
   }
+  :disabled {
+    ::-webkit-slider-thumb {
+      background: ${ctrlColor}; /* Green background */
+    }
+  }
 `;
 
 interface Props {
@@ -42,6 +47,7 @@ interface Props {
   max?: number;
   step?: number;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 const RangeSlider: React.FC<Props> = ({
   value = 0,
@@ -50,14 +56,20 @@ const RangeSlider: React.FC<Props> = ({
   step = 0.01,
   onChange = (e) => undefined,
   id = '',
+  disabled,
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     const t = ((value - min) / (max - min)) * 100;
-    inputRef.current!.style.background = `linear-gradient(to right, #FFF 0%, #FFF ${t}%, ${inputBg} ${t}%, ${inputBg} 100%)`;
+    inputRef.current!.style.background = `linear-gradient(to right, ${
+      disabled ? inputBgDisabled : '#FFF'
+    } 0%, ${
+      disabled ? inputBgDisabled : '#FFF'
+    } ${t}%, ${inputBg} ${t}%, ${inputBg} 100%)`;
   }, [value, min, max]);
   return (
     <SliderInput
+      disabled={disabled}
       ref={inputRef}
       type="range"
       min={min}

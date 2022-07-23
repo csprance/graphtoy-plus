@@ -1,4 +1,6 @@
+export const linkColor = '#ffb010'
 export const inputBg = '#202020';
+export const inputBgDisabled = '#545454';
 export const ctrlColor = '#606060';
 export const ctrlColorHover = '#b08010';
 export const red = '#ec0909';

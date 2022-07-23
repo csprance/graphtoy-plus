@@ -12,84 +12,6 @@ import {
 import { Formula, Variable, VisualizerState } from '../lib/graphtoy/types';
 import { makeMapPartialByID, sortById } from '../lib/utils';
 
-export interface State {
-  // An array of all the formulas displayed on the graph
-  formulas: Formula[];
-  // An array of all the formula colors
-  formulaColors: string[];
-  // An array of adjustable variables used in formulas
-  variables: Variable[];
-}
-
-export interface Actions {
-  /**
-   * Set the formula value based on an index
-   * @param id
-   * @param value
-   */
-  setFormulaValue: (id: number, value: string) => void;
-  /**
-   * Set a formula partial using an id
-   * @param id
-   * @param partial
-   */
-  setFormulaByID: (id: number, partial: Partial<Formula>) => void;
-  /**
-   * Toggle the formula visibility on and off in the grid
-   * @param id The ID of the formula to toggle
-   */
-  toggleFormulaVisibility: (id: number) => void;
-  /**
-   * Inject a string in to the active formula window
-   * @param value The value to inject
-   */
-  inject: (value: string) => void;
-  /**
-   * Clear all the formulas and replace them with empty formulas
-   */
-  clearFormulas: () => void;
-  /**
-   * Set the formulas to the example formulas 1
-   */
-  setExampleFormulas1: () => void;
-  /**
-   * Set the formulas to the example formulas 2
-   */
-  setExampleFormulas2: () => void;
-  /**
-   * Set the formulas to the example formulas 2
-   */
-  setExampleFormulas3: () => void;
-  /**
-   * Set and derive the state of the visualizers on each Formula given a visualizer state and an id
-   * @param id The ID of the formula to set the visualizer state on
-   * @param visualizerState a VisualizerState
-   */
-  setVisualizers: (id: number, visualizerState: VisualizerState) => void;
-  /**
-   * Given the state of the application create a link we can parse into the app state
-   */
-  createLink: () => void;
-  /**
-   * Get the url and parse the formula in to the app state
-   */
-  parseUrlFormulas: () => void;
-  /**
-   * Set a value on a variable
-   * @param id The ID of the variable to set
-   * @param partial A partial of a Variable to set
-   */
-  setVariable: (id: number, partial: Partial<Variable>) => void;
-  /**
-   * Add Grapher to our state to manipulate it globally
-   * @param grapher
-   */
-  setGrapher: (grapher: Grapher) => void;
-  grapher: Grapher;
-}
-
-export type MyStore = State & Actions;
-
 export const useStore = create<MyStore>()((set, get) => ({
   // ////////////////////////////
   // Grapher
@@ -121,16 +43,28 @@ export const useStore = create<MyStore>()((set, get) => ({
   setFormulaByID: (id, partial) =>
     set((state) => ({
       formulas: state.formulas
-        .map(makeMapPartialByID(id + 1, partial))
+        .map(makeMapPartialByID(id, partial))
         .sort(sortById),
     })),
   setFormulaValue: (id, value) => {
     get().setFormulaByID(id, { value });
   },
-  clearFormulas: () => set({ formulas: defaultFormulas }),
-  setExampleFormulas1: () => set({ formulas: exampleFormulas1 }),
-  setExampleFormulas2: () => set({ formulas: exampleFormulas2 }),
-  setExampleFormulas3: () => set({ formulas: exampleFormulas3 }),
+  clearFormulas: () => {
+    get().grapher.resetCoords();
+    set({ formulas: defaultFormulas });
+  },
+  setExampleFormulas1: () => {
+    get().grapher.resetCoords();
+    set({ formulas: exampleFormulas1 });
+  },
+  setExampleFormulas2: () => {
+    get().grapher.resetCoords();
+    set({ formulas: exampleFormulas2 });
+  },
+  setExampleFormulas3: () => {
+    get().grapher.resetCoords();
+    set({ formulas: exampleFormulas3 });
+  },
   setVisualizers: (id, visualizerState) =>
     set(
       produce((draft) => {
@@ -149,10 +83,6 @@ export const useStore = create<MyStore>()((set, get) => ({
         draft.formulas[id].visualizer = visualizerState;
       }),
     ),
-  inject: (value) => {
-    document.execCommand('insertText', false, value);
-  },
-
   ///////////////////////
   // link parsing stuff
   createLink: () => {
@@ -201,3 +131,77 @@ export const useStore = create<MyStore>()((set, get) => ({
         })),
     })),
 }));
+
+export interface State {
+  // The main class that handles rendering the graph
+  grapher: Grapher;
+  // An array of all the formulas displayed on the graph
+  formulas: Formula[];
+  // An array of all the formula colors
+  formulaColors: string[];
+  // An array of adjustable variables used in formulas
+  variables: Variable[];
+}
+
+export interface Actions {
+  /**
+   * Set the formula value based on an index
+   * @param id
+   * @param value
+   */
+  setFormulaValue: (id: number, value: string) => void;
+  /**
+   * Set a formula partial using an id
+   * @param id
+   * @param partial
+   */
+  setFormulaByID: (id: number, partial: Partial<Formula>) => void;
+  /**
+   * Toggle the formula visibility on and off in the grid
+   * @param id The ID of the formula to toggle
+   */
+  toggleFormulaVisibility: (id: number) => void;
+  /**
+   * Clear all the formulas and replace them with empty formulas
+   */
+  clearFormulas: () => void;
+  /**
+   * Set the formulas to the example formulas 1
+   */
+  setExampleFormulas1: () => void;
+  /**
+   * Set the formulas to the example formulas 2
+   */
+  setExampleFormulas2: () => void;
+  /**
+   * Set the formulas to the example formulas 2
+   */
+  setExampleFormulas3: () => void;
+  /**
+   * Set and derive the state of the visualizers on each Formula given a visualizer state and an id
+   * @param id The ID of the formula to set the visualizer state on
+   * @param visualizerState a VisualizerState
+   */
+  setVisualizers: (id: number, visualizerState: VisualizerState) => void;
+  /**
+   * Given the state of the application create a link we can parse into the app state
+   */
+  createLink: () => void;
+  /**
+   * Get the url and parse the formula in to the app state
+   */
+  parseUrlFormulas: () => void;
+  /**
+   * Set a value on a variable
+   * @param id The ID of the variable to set
+   * @param partial A partial of a Variable to set
+   */
+  setVariable: (id: number, partial: Partial<Variable>) => void;
+  /**
+   * Add Grapher to our state to manipulate it globally
+   * @param grapher
+   */
+  setGrapher: (grapher: Grapher) => void;
+}
+
+export type MyStore = State & Actions;

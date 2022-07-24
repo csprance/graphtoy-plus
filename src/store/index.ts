@@ -1,5 +1,6 @@
 import produce from 'immer';
 import create from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import Grapher from '../lib/graphtoy';
 import {
@@ -12,140 +13,151 @@ import {
 import { Formula, Variable, VisualizerState } from '../lib/graphtoy/types';
 import { makeMapPartialByID, sortById } from '../lib/utils';
 
-export const useStore = create<MyStore>()((set, get) => ({
-  // /////////////////////////////
-  // Notes
-  notes: '',
-  setNotes: (notes) => set({ notes }),
-  // ////////////////////////////
-  // Grapher
-  grapher: new Grapher(),
-  setGrapher: (grapher) => set({ grapher }),
+export const useStore = create<MyStore>()(
+  persist(
+    (set, get) => ({
+      // /////////////////////////////
+      // Notes
+      notes: '',
+      setNotes: (notes) => set({ notes }),
+      // ////////////////////////////
+      // Grapher
+      grapher: new Grapher(),
+      setGrapher: (grapher) => set({ grapher }),
 
-  // ////////////////////////////
-  // Formulas
-  // state
-  formulas: exampleFormulas1,
-  formulaColors: [
-    '#ffc040',
-    '#ffffa0',
-    '#a0ffc0',
-    '#40c0ff',
-    '#d0a0ff',
-    '#ff80b0',
-  ],
-  // actions
-  toggleFormulaVisibility: (id) =>
-    set((state) => ({
-      formulas: [
-        ...state.formulas.map((f) => ({
-          ...f,
-          enabled: f.id === id ? !f.enabled : f.enabled,
-        })),
+      // ////////////////////////////
+      // Formulas
+      // state
+      formulas: exampleFormulas1,
+      formulaColors: [
+        '#ffc040',
+        '#ffffa0',
+        '#a0ffc0',
+        '#40c0ff',
+        '#d0a0ff',
+        '#ff80b0',
       ],
-    })),
-  setFormulaByID: (id, partial) =>
-    set((state) => ({
-      formulas: state.formulas
-        .map(makeMapPartialByID(id, partial))
-        .sort(sortById),
-    })),
-  setFormulaValue: (id, value) => {
-    get().setFormulaByID(id, { value });
-  },
-  clearFormulas: () => {
-    get().grapher.resetCoords();
-    set({ formulas: defaultFormulas });
-  },
-  setExampleFormulas1: () => {
-    get().grapher.resetCoords();
-    set({ formulas: exampleFormulas1 });
-  },
-  setExampleFormulas2: () => {
-    get().grapher.resetCoords();
-    set({ formulas: exampleFormulas2 });
-  },
-  setExampleFormulas3: () => {
-    get().grapher.resetCoords();
-    set({ formulas: exampleFormulas3 });
-  },
-  setVisualizers: (id, visualizerState) =>
-    set(
-      produce((draft) => {
-        // Given an id and a visualizer state for that formula derive the other visualizer states
-        // Only one Channel can be active for all formulas (One Red for all Formulas, One Green, one Blue)
-        // Set the one we want to modify
-
-        // Loop through the others and decide if they should be turned off
-        for (let i = 0; i < draft.formulas.length; i++) {
-          const f = draft.formulas[i];
-          // If a value is true then all the others should be false otherwise leave em the same
-          f.visualizer[0] = visualizerState[0] ? false : f.visualizer[0];
-          f.visualizer[1] = visualizerState[1] ? false : f.visualizer[1];
-          f.visualizer[2] = visualizerState[2] ? false : f.visualizer[2];
-        }
-        draft.formulas[id].visualizer = visualizerState;
-      }),
-    ),
-  ///////////////////////
-  // link parsing stuff
-  createLink: () => {
-    // Get the state of the application that matters
-    const state = get();
-    const url = new URL(window.location.href);
-    url.searchParams.set('variables', JSON.stringify(state.variables));
-    url.searchParams.set('formulas', JSON.stringify(state.formulas));
-    url.searchParams.set('notes', JSON.stringify(state.notes));
-    // Push it to clipboard and set it as the current URL
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(url.toString()).then(
-        function () {
-          window.location.replace(url);
-        },
-        function (err) {
-          window.location.replace(url);
-        },
-      );
-    } else {
-      window.location.replace(url);
-    }
-  },
-  parseUrlFormulas: () => {
-    const url = new URL(window.location.href);
-    const variables = url.searchParams.get('variables');
-    const formulas = url.searchParams.get('formulas');
-    const notes = url.searchParams.get('notes');
-    if (formulas) {
-      set({
-        formulas: JSON.parse(formulas),
-      });
-    }
-    if (notes) {
-      set({
-        notes: JSON.parse(notes),
-      });
-    }
-    if (variables) {
-      set({
-        variables: JSON.parse(variables),
-      });
-    }
-  },
-
-  ///////////////////////
-  // Variables
-  variables: defaultVariables,
-  setVariable: (id, partial) =>
-    set((state) => ({
-      variables: state.variables
-        .map(makeMapPartialByID(id, partial))
-        .map((v) => ({
-          ...v,
-          // prevent Divide by zero
-          value: v.value === 0 ? v.value + Number.EPSILON : v.value,
+      // actions
+      toggleFormulaVisibility: (id) =>
+        set((state) => ({
+          formulas: [
+            ...state.formulas.map((f) => ({
+              ...f,
+              enabled: f.id === id ? !f.enabled : f.enabled,
+            })),
+          ],
         })),
-    })),
-}));
+      setFormulaByID: (id, partial) =>
+        set((state) => ({
+          formulas: state.formulas
+            .map(makeMapPartialByID(id, partial))
+            .sort(sortById),
+        })),
+      setFormulaValue: (id, value) => {
+        get().setFormulaByID(id, { value });
+      },
+      clearFormulas: () => {
+        get().grapher.resetCoords();
+        set({ formulas: defaultFormulas });
+      },
+      setExampleFormulas1: () => {
+        get().grapher.resetCoords();
+        set({ formulas: exampleFormulas1 });
+      },
+      setExampleFormulas2: () => {
+        get().grapher.resetCoords();
+        set({ formulas: exampleFormulas2 });
+      },
+      setExampleFormulas3: () => {
+        get().grapher.resetCoords();
+        set({ formulas: exampleFormulas3 });
+      },
+      setVisualizers: (id, visualizerState) =>
+        set(
+          produce((draft) => {
+            // Given an id and a visualizer state for that formula derive the other visualizer states
+            // Only one Channel can be active for all formulas (One Red for all Formulas, One Green, one Blue)
+            // Set the one we want to modify
+
+            // Loop through the others and decide if they should be turned off
+            for (let i = 0; i < draft.formulas.length; i++) {
+              const f = draft.formulas[i];
+              // If a value is true then all the others should be false otherwise leave em the same
+              f.visualizer[0] = visualizerState[0] ? false : f.visualizer[0];
+              f.visualizer[1] = visualizerState[1] ? false : f.visualizer[1];
+              f.visualizer[2] = visualizerState[2] ? false : f.visualizer[2];
+            }
+            draft.formulas[id].visualizer = visualizerState;
+          }),
+        ),
+      ///////////////////////
+      // link parsing stuff
+      createLink: () => {
+        // Get the state of the application that matters
+        const state = get();
+        const url = new URL(window.location.href);
+        url.searchParams.set('variables', JSON.stringify(state.variables));
+        url.searchParams.set('formulas', JSON.stringify(state.formulas));
+        url.searchParams.set('notes', JSON.stringify(state.notes));
+        // Push it to clipboard and set it as the current URL
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url.toString()).then(
+            function () {
+              window.location.replace(url);
+            },
+            function (err) {
+              window.location.replace(url);
+            },
+          );
+        } else {
+          window.location.replace(url);
+        }
+      },
+      parseUrlFormulas: () => {
+        const url = new URL(window.location.href);
+        const variables = url.searchParams.get('variables');
+        const formulas = url.searchParams.get('formulas');
+        const notes = url.searchParams.get('notes');
+        if (formulas) {
+          set({
+            formulas: JSON.parse(formulas),
+          });
+        }
+        if (notes) {
+          set({
+            notes: JSON.parse(notes),
+          });
+        }
+        if (variables) {
+          set({
+            variables: JSON.parse(variables),
+          });
+        }
+      },
+
+      ///////////////////////
+      // Variables
+      variables: defaultVariables,
+      setVariable: (id, partial) =>
+        set((state) => ({
+          variables: state.variables
+            .map(makeMapPartialByID(id, partial))
+            .map((v) => ({
+              ...v,
+              // prevent Divide by zero
+              value: v.value === 0 ? v.value + Number.EPSILON : v.value,
+            })),
+        })),
+    }),
+    {
+      name: 'graphtoy-plus',
+      partialize: (state) =>
+          Object.fromEntries(
+              Object.entries(state).filter(([key]) => !["grapher"].includes(key))
+          ),
+    },
+  ),
+);
 
 export interface State {
   notes: string;

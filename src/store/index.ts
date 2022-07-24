@@ -149,9 +149,11 @@ export const useStore = create<MyStore>()(
             })),
         })),
     }),
+      // Persistence settings
     {
       name: 'graphtoy-plus',
       partialize: (state) =>
+          // Filter grapher from being stored and persisted.
           Object.fromEntries(
               Object.entries(state).filter(([key]) => !["grapher"].includes(key))
           ),
@@ -160,6 +162,7 @@ export const useStore = create<MyStore>()(
 );
 
 export interface State {
+    // Notes on the current graph.
   notes: string;
   // The main class that handles rendering the graph
   grapher: Grapher;

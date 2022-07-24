@@ -1,8 +1,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import Editor from 'react-simple-code-editor';
+import {highlight, languages} from 'prismjs';
+import 'prismjs/components/prism-markdown';
 
-import { useStore } from '../store';
-import { bgColor, ctrlColor, inputBg } from '../styles';
+import {useStore} from '../store';
+import {bgColor, ctrlColor, inputBg} from '../styles';
 
 const Wrapper = styled.div`
   background: ${bgColor};
@@ -11,7 +14,7 @@ const Wrapper = styled.div`
   grid-template-rows: 30px auto;
   border-radius: 5px;
 `;
-const CustomTextArea = styled.textarea`
+const CustomTextArea = styled(Editor)`
   border-radius: 5px;
   background: ${inputBg};
   border-color: transparent;
@@ -31,11 +34,15 @@ const Notes: React.FC<Props> = () => {
       <CustomTextArea
         value={notes}
         className={'userInput'}
-        onChange={(e) => setNotes(e.target.value)}
+        highlight={(code)=> highlight(code, languages.markdown, 'md')}
+        onValueChange={(code) => setNotes(code)}
         name="notes"
+        padding={10}
         id="notes"
-        cols={30}
-        rows={10}
+        style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+        }}
       />
     </Wrapper>
   );

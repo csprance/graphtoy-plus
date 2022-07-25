@@ -25,8 +25,10 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         <meta
           name="viewport"
           content={
-            'user-scalable=0, initial-scale=1, ' +
-            'minimum-scale=1, width=device-width, height=device-height'
+            'initial-scale=1, ' +
+            'minimum-scale=1, ' +
+            'width=device-width, ' +
+            'height=device-height'
           }
         />
       </Head>

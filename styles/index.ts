@@ -15,6 +15,15 @@ export const GlobalStyles = createGlobalStyle`
     --ctrlColor: #606060;
     --ctrlColorHover: #b08010;
   }
+  
+  .sr-only {
+    position:absolute;
+    left:-10000px;
+    top:auto;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+  }
 
   body {
     color: #ffffff;

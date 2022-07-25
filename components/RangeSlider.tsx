@@ -41,6 +41,7 @@ const SliderInput = styled.input`
 `;
 
 interface Props {
+  name: string;
   id?: string;
   value?: number;
   min?: number;
@@ -50,6 +51,7 @@ interface Props {
   disabled?: boolean;
 }
 const RangeSlider: React.FC<Props> = ({
+  name,
   value = 0,
   min = -1,
   max = 1,
@@ -66,21 +68,27 @@ const RangeSlider: React.FC<Props> = ({
     } 0%, ${
       disabled ? inputBgDisabled : '#FFF'
     } ${t}%, ${inputBg} ${t}%, ${inputBg} 100%)`;
-  }, [value, min, max]);
+  }, [value, min, max, disabled]);
   return (
-    <SliderInput
-      disabled={disabled}
-      ref={inputRef}
-      type="range"
-      min={min}
-      max={max}
-      value={value}
-      step={step}
-      id={id}
-      onChange={(e) => {
-        onChange(e);
-      }}
-    />
+    <>
+      <label className={'sr-only'} htmlFor={name}>
+        Range Slider for {name}
+      </label>
+      <SliderInput
+        name={name}
+        id={name}
+        disabled={disabled}
+        ref={inputRef}
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        step={step}
+        onChange={(e) => {
+          onChange(e);
+        }}
+      />
+    </>
   );
 };
 

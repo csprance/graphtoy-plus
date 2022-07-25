@@ -28,6 +28,7 @@ const TimelineBar: React.FC<Props> = () => {
 
   return (
     <RangeSlider
+      name={'timeline-range-slider'}
       disabled={!paused}
       min={0}
       max={clamp(t + 150, 0, 1500)}

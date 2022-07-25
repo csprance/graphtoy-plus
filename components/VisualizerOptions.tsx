@@ -43,7 +43,11 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b, id }) => {
   };
   return (
     <Wrapper>
+      <label className={'sr-only'} htmlFor={`red-visualizer-${id}`}>
+        Red Visualizer
+      </label>
       <MyCheckbox
+        id={`red-visualizer-${id}`}
         checked={r}
         onChange={(e) => setVisualizers(id, [e.target.checked, g, b])}
         onContextMenu={toggleOthersContextMenu}
@@ -51,7 +55,11 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b, id }) => {
         type="checkbox"
       />
 
+      <label className={'sr-only'} htmlFor={`green-visualizer-${id}`}>
+        Green Visualizer
+      </label>
       <MyCheckbox
+        id={`green-visualizer-${id}`}
         checked={g}
         onChange={(e) => setVisualizers(id, [r, e.target.checked, b])}
         onContextMenu={toggleOthersContextMenu}
@@ -59,7 +67,11 @@ const VisualizerOptions: React.FC<Props> = ({ r, g, b, id }) => {
         type="checkbox"
       />
 
+      <label className={'sr-only'} htmlFor={`blue-visualizer-${id}`}>
+        Blue Visualizer
+      </label>
       <MyCheckbox
+        id={`blue-visualizer-${id}`}
         checked={b}
         onChange={(e) => setVisualizers(id, [r, g, e.target.checked])}
         onContextMenu={toggleOthersContextMenu}

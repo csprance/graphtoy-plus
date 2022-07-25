@@ -60,7 +60,11 @@ const FormulaComponent: React.FC<Props> = ({
         f<sub>{id}</sub>(x,t) = &nbsp;
       </div>
       <div style={{ width: '100%' }}>
+        <label className={'sr-only'} htmlFor={`f${id}-input`}>
+          Formula input field for formula {id}
+        </label>
         <FormulaInputField
+          textareaId={`f${id}-input`}
           value={value}
           error={error ? 'false' : undefined}
           onValueChange={(code) => setFormulaValue(id, code)}

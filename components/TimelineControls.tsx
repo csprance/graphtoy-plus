@@ -30,11 +30,12 @@ const TimelineControls: React.FC<Props> = () => {
       <TimelineBar />
       <Time />
 
-      <Button onClick={() => grapher.resetTime()}>
+      <Button name={'reset-time'} onClick={() => grapher.resetTime()}>
         <ResetIcon />
       </Button>
 
       <Button
+        name={paused ? 'start-time' : 'pause-time'}
         onClick={() => {
           setPaused(!paused);
           grapher.togglePlay();

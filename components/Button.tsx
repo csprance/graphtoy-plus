@@ -21,9 +21,14 @@ const StyledButton = styled.button`
 `;
 interface Props extends React.PropsWithChildren {
   onClick: () => void;
+  name: string;
 }
-const Button: React.FC<Props> = ({ children, onClick }) => {
-  return <StyledButton onClick={onClick}>{children}</StyledButton>;
+const Button: React.FC<Props> = ({ children, onClick, name }) => {
+  return (
+    <StyledButton aria-label={name} onClick={onClick}>
+      {children}
+    </StyledButton>
+  );
 };
 
 export default Button;

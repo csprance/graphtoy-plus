@@ -34,7 +34,11 @@ const VariableComponent: React.FC<Props> = ({
     <Wrapper>
       <div style={{ textAlign: 'center' }}>{name}</div>
 
+      <label className={'sr-only'} htmlFor={`value-input-for-variable-${name}`}>
+        Value input for Variable {name}
+      </label>
       <input
+        id={`value-input-for-variable-${name}`}
         className={'userInput'}
         style={{ height: 20, marginLeft: 5, marginRight: 5 }}
         type="text"
@@ -43,15 +47,22 @@ const VariableComponent: React.FC<Props> = ({
       />
 
       <RangeSlider
+        name={`range-slider-for-variable-${name}`}
         min={min}
         max={max}
         value={value}
         step={step}
-        id="a"
         onChange={setVariableOnChange('value')}
       />
 
+      <label
+        className={'sr-only'}
+        htmlFor={`min-value-input-for-variable-${name}`}
+      >
+        Min Value input for Variable {name}
+      </label>
       <input
+        id={`min-value-input-for-variable-${name}`}
         className={'userInput'}
         style={{ height: 20, marginLeft: 5, marginRight: 5 }}
         type="text"
@@ -59,7 +70,14 @@ const VariableComponent: React.FC<Props> = ({
         onChange={setVariableOnChange('min')}
       />
 
+      <label
+        className={'sr-only'}
+        htmlFor={`max-value-input-for-variable-${name}`}
+      >
+        Max Value input for Variable {name}
+      </label>
       <input
+        id={`max-value-input-for-variable-${name}`}
         className={'userInput'}
         style={{ height: 20, marginLeft: 5, marginRight: 5 }}
         type="text"

@@ -21,7 +21,7 @@ const Variables: React.FC<Props> = () => {
       <Wrapper>
         <div>Var</div>
         <div>Value</div>
-        <h3 style={{ padding: 0, margin: 0 }}>Variables</h3>
+        <p style={{ fontSize: '17.5px', padding: 0, margin: 0 }}>Variables</p>
         <div>Min</div>
         <div>Max</div>
       </Wrapper>

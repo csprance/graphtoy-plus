@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   grid-template-columns: 80px auto 150px;
   padding-bottom: 4px;
 `;
-const FormulaInputField = styled(Editor)<{ error: boolean }>`
+const FormulaInputField = styled(Editor)<{ error?: string }>`
   width: 100%;
   border: ${({ error }) => (error ? 'red' : 'transparent')} 2px solid;
 `;
@@ -62,7 +62,7 @@ const FormulaComponent: React.FC<Props> = ({
       <div style={{ width: '100%' }}>
         <FormulaInputField
           value={value}
-          error={!!error}
+          error={error ? 'false' : undefined}
           onValueChange={(code) => setFormulaValue(id, code)}
           highlight={(code) => highlight(code, languages.js, 'javascript')}
           padding={10}

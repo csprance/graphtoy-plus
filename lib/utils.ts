@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+
+import { useStore } from '../store';
 import { Formula } from './graphtoy/types';
 
 export function isNumber(s: string) {

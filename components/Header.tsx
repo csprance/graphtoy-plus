@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import packageJSON from '../../package.json';
+import packageJSON from '../package.json';
 
 const Wrapper = styled.div``;
 const Title = styled.h1`
@@ -25,9 +25,9 @@ const Header: React.FC<Props> = () => {
         {packageJSON.version}
       </Title>
       <span>
-        by <a href="https://iquilezles.org/">Inigo Quilez</a> (feedback from
-        Rafæl Couto, Florian Mosleh, Nicholas Ralabate and Rich Eakin,
-        Graphtoy-Plus extras by
+        by <a href="components/Header">Inigo Quilez</a> (feedback from Rafæl
+        Couto, Florian Mosleh, Nicholas Ralabate and Rich Eakin, Graphtoy-Plus
+        extras by
         <a href="https://csprance.com"> Chris Sprance</a>). If you find Graphtoy
         useful, please consider supporting it by donating through my
         <BubbleLink

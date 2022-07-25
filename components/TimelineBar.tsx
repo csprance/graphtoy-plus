@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { MyMath } from '../lib/graphtoy/lib';
+import { clamp } from '../lib/graphtoy/lib';
 import { OnPlayPauseFn, OnTimeUpdateFn } from '../lib/graphtoy/types';
 import { useStore } from '../store';
 import RangeSlider from './RangeSlider';
@@ -30,7 +30,7 @@ const TimelineBar: React.FC<Props> = () => {
     <RangeSlider
       disabled={!paused}
       min={0}
-      max={MyMath.clamp(t + 150, 0, 1500)}
+      max={clamp(t + 150, 0, 1500)}
       value={t}
       step={0.1}
       id="a"

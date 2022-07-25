@@ -1,6 +1,7 @@
 import produce from 'immer';
+import { useEffect, useState } from 'react';
 import create from 'zustand';
-import { persist } from 'zustand/middleware';
+import { StateStorage, persist } from 'zustand/middleware';
 
 import Grapher from '../lib/graphtoy';
 import {
@@ -149,20 +150,34 @@ export const useStore = create<MyStore>()(
             })),
         })),
     }),
-      // Persistence settings
+    // Persistence settings
     {
       name: 'graphtoy-plus',
+      getStorage: () => sessionStorage,
       partialize: (state) =>
-          // Filter grapher from being stored and persisted.
-          Object.fromEntries(
-              Object.entries(state).filter(([key]) => !["grapher"].includes(key))
-          ),
+        // Filter grapher from being stored and persisted.
+        Object.fromEntries(
+          Object.entries(state).filter(([key]) => !['grapher'].includes(key)),
+        ),
     },
   ),
 );
 
+// Custom storage object
+export const AsyncStorage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await localStorage.getItem(name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await localStorage.setItem(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await localStorage.removeItem(name);
+  },
+};
+
 export interface State {
-    // Notes on the current graph.
+  // Notes on the current graph.
   notes: string;
   // The main class that handles rendering the graph
   grapher: Grapher;

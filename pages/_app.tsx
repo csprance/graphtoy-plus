@@ -45,8 +45,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   // calls page's `getInitialProps` and fills `appProps.pageProps`
   const appProps = await App.getInitialProps(appContext);
   const cookies = parseCookies(appContext.ctx);
-  const state = JSON.parse(cookies['graphtoy-plus']);
-  return { ...appProps, pageProps: state };
+  if ('graphtoy-plus' in cookies){
+    const state = JSON.parse(cookies['graphtoy-plus']);
+    return { ...appProps, pageProps: state };
+  }
+  return {...appProps}
 };
 
 export default MyApp;

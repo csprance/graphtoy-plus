@@ -1,7 +1,8 @@
 import produce from 'immer';
-import { useEffect, useState } from 'react';
-import create from 'zustand';
-import { StateStorage, persist } from 'zustand/middleware';
+import { useLayoutEffect } from 'react';
+import create, { StoreApi, UseBoundStore } from "zustand";
+import createContext from 'zustand/context';
+import { combine } from 'zustand/middleware';
 
 import Grapher from '../lib/graphtoy';
 import {
@@ -14,30 +15,43 @@ import {
 import { Formula, Variable, VisualizerState } from '../lib/graphtoy/types';
 import { makeMapPartialByID, sortById } from '../lib/utils';
 
-export const useStore = create<MyStore>()(
-  persist(
-    (set, get) => ({
+let store: StoreApi<MyStore>;
+
+type InitialState = ReturnType<typeof getDefaultInitialState>;
+type UseStoreState = typeof initializeStore extends (
+  ...args: never
+) => UseBoundStore<infer T>
+  ? T
+  : never;
+
+const getDefaultInitialState: () => State = () => ({
+  formulas: exampleFormulas1,
+  grapher: new Grapher(),
+  notes: '',
+  variables: defaultVariables,
+  formulaColors: [
+    '#ffc040',
+    '#ffffa0',
+    '#a0ffc0',
+    '#40c0ff',
+    '#d0a0ff',
+    '#ff80b0',
+  ],
+});
+
+export const  { Provider, useStoreApi, useStore, }  = createContext<UseStoreState>();
+
+export const initializeStore = (preloadedState = {}) =>
+  create<MyStore>()(
+    combine({ ...getDefaultInitialState(), ...preloadedState }, (set, get) => ({
       // /////////////////////////////
       // Notes
-      notes: '',
       setNotes: (notes) => set({ notes }),
       // ////////////////////////////
       // Grapher
-      grapher: new Grapher(),
       setGrapher: (grapher) => set({ grapher }),
-
       // ////////////////////////////
       // Formulas
-      // state
-      formulas: exampleFormulas1,
-      formulaColors: [
-        '#ffc040',
-        '#ffffa0',
-        '#a0ffc0',
-        '#40c0ff',
-        '#d0a0ff',
-        '#ff80b0',
-      ],
       // actions
       toggleFormulaVisibility: (id) =>
         set((state) => ({
@@ -55,7 +69,7 @@ export const useStore = create<MyStore>()(
             .sort(sortById),
         })),
       setFormulaValue: (id, value) => {
-        get().setFormulaByID(id, { value });
+        (get() as any).setFormulaByID(id, { value });
       },
       clearFormulas: () => {
         get().grapher.resetCoords();
@@ -135,10 +149,8 @@ export const useStore = create<MyStore>()(
           });
         }
       },
-
       ///////////////////////
       // Variables
-      variables: defaultVariables,
       setVariable: (id, partial) =>
         set((state) => ({
           variables: state.variables
@@ -149,31 +161,41 @@ export const useStore = create<MyStore>()(
               value: v.value === 0 ? v.value + Number.EPSILON : v.value,
             })),
         })),
-    }),
-    // Persistence settings
-    {
-      name: 'graphtoy-plus',
-      getStorage: () => sessionStorage,
-      partialize: (state) =>
-        // Filter grapher from being stored and persisted.
-        Object.fromEntries(
-          Object.entries(state).filter(([key]) => !['grapher'].includes(key)),
-        ),
-    },
-  ),
-);
+    })),
+  );
 
-// Custom storage object
-export const AsyncStorage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    return (await localStorage.getItem(name)) || null;
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    await localStorage.setItem(name, value);
-  },
-  removeItem: async (name: string): Promise<void> => {
-    await localStorage.removeItem(name);
-  },
+export const useCreateStore = (serverInitialState: InitialState) => {
+  // For SSR & SSG, always use a new store.
+  if (typeof window === 'undefined') {
+    return () => initializeStore(serverInitialState);
+  }
+
+  const isReusingStore = Boolean(store);
+  // For CSR, always re-use same store.
+  store = store ?? initializeStore({ ...serverInitialState, grapher: new Grapher() });
+  // And if initialState changes, then merge states in the next render cycle.
+  //
+  // eslint complaining "React Hooks must be called in the exact same order in every component render"
+  // is ignorable as this code runs in same order in a given environment
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useLayoutEffect(() => {
+    // serverInitialState is undefined for CSR pages. It is up to you if you want to reset
+    // states on CSR page navigation or not. I have chosen not to, but if you choose to,
+    // then add `serverInitialState = getDefaultInitialState()` here.
+    if (serverInitialState && isReusingStore) {
+      store.setState(
+        {
+          // re-use functions from existing store
+          ...store.getState(),
+          // but reset all other properties.
+          ...serverInitialState,
+        },
+        true, // replace states, rather than shallow merging
+      );
+    }
+  });
+
+  return () => store;
 };
 
 export interface State {

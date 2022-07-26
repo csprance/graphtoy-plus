@@ -6,6 +6,7 @@
     "immer": "^9.0.15",
     "mitt": "^3.0.0",
     "next": "latest",
+    "nookies": "^2.5.2",
     "prismjs": "^1.28.0",
     "react": "latest",
     "react-dom": "latest",

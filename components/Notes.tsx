@@ -1,11 +1,11 @@
-import { highlight, languages } from "prismjs";
-import "prismjs/components/prism-markdown";
-import * as React from "react";
-import Editor from "react-simple-code-editor";
-import styled from "styled-components";
+import { highlight, languages } from 'prismjs';
+import 'prismjs/components/prism-markdown';
+import * as React from 'react';
+import Editor from 'react-simple-code-editor';
+import styled from 'styled-components';
 
-import { useStore } from "../store";
-import { bgColor, ctrlColor, inputBg } from "../styles";
+import { useStore } from '../store';
+import { bgColor, ctrlColor, inputBg } from '../styles';
 
 const Wrapper = styled.div`
   background: ${bgColor};
@@ -28,7 +28,15 @@ const Notes: React.FC<Props> = () => {
   const { notes, setNotes } = useStore();
   return (
     <Wrapper>
-      <p style={{fontSize: '17.5px', padding: 0, margin: 0, width: '100%', textAlign: 'center' }}>
+      <p
+        style={{
+          fontSize: '17.5px',
+          padding: 0,
+          margin: 0,
+          width: '100%',
+          textAlign: 'center',
+        }}
+      >
         Notes
       </p>
       <label className={'sr-only'} htmlFor={`notes-input`}>

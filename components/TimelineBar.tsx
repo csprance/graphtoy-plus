@@ -8,7 +8,7 @@ import RangeSlider from './RangeSlider';
 interface Props {}
 const TimelineBar: React.FC<Props> = () => {
   const { grapher } = useStore();
-  const [t, setT] = React.useState(grapher.mTimeS);
+  const [t, setT] = React.useState( 0);
   const [paused, setPaused] = React.useState(false);
 
   React.useEffect(() => {

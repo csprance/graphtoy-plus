@@ -9,8 +9,8 @@ COPY . .
 
 EXPOSE 3000
 
-# generate prisma db
-RUN yarn prisma:generate
+# deploy prisma migrate/generate
+RUN yarn prisma:deploy
 # build and start
 RUN yarn build
 # start

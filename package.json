@@ -23,6 +23,7 @@
     "lint": "next lint",
     "prettier": "prettier --write \"**/*.{ts,tsx}\" ",
     "start": "next start",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma-pull-db": "prisma db pull",
     "prisma:generate": "prisma generate",
     "build-start": "next build && next start",

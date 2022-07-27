@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-
-import { useStore } from '../store';
-import { Formula } from './graphtoy/types';
+import { PrismaClient } from "@prisma/client";
+import { Formula } from "./graphtoy/types";
 
 export function isNumber(s: string) {
   if (['-', '-.', '.', ''].includes(s)) {
@@ -60,4 +58,27 @@ export function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 
 export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
+}
+
+export const isProd = () => process.env.NODE_ENV === 'production';
+
+export function createRandomKey(idLength: number = 5) {
+  let text = '';
+  const possible =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < idLength; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
+export async function createUniqueRandomKey(keyLength: number = 5) {
+  const prisma = new PrismaClient();
+  let key = createRandomKey(keyLength);
+  // If we find a key then create a new one and keep creating new ones until we find a legit key
+  while (await prisma.tiny_url.findFirst({ where: { url: key} })) {
+    key = createRandomKey(keyLength);
+  }
+  return key;
 }

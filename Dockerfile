@@ -9,6 +9,9 @@ COPY . .
 
 EXPOSE 3000
 
+# generate prisma db
+RUN yarn prisma:generate
 # build and start
-RUN npm run build
+RUN yarn build
+# start
 CMD npm run start

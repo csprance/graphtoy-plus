@@ -1,6 +1,7 @@
+import axios from 'axios';
 import produce from 'immer';
 import { useLayoutEffect } from 'react';
-import create, { StoreApi, UseBoundStore } from "zustand";
+import create, { StoreApi, UseBoundStore } from 'zustand';
 import createContext from 'zustand/context';
 import { combine } from 'zustand/middleware';
 
@@ -24,7 +25,7 @@ type UseStoreState = typeof initializeStore extends (
   ? T
   : never;
 
-const getDefaultInitialState: () => State = () => ({
+export const getDefaultInitialState: () => State = () => ({
   formulas: exampleFormulas1,
   grapher: new Grapher(),
   notes: '',
@@ -39,7 +40,8 @@ const getDefaultInitialState: () => State = () => ({
   ],
 });
 
-export const  { Provider, useStoreApi, useStore, }  = createContext<UseStoreState>();
+export const { Provider, useStoreApi, useStore } =
+  createContext<UseStoreState>();
 
 export const initializeStore = (preloadedState = {}) =>
   create<MyStore>()(
@@ -107,25 +109,32 @@ export const initializeStore = (preloadedState = {}) =>
         ),
       ///////////////////////
       // link parsing stuff
-      createLink: () => {
+      createLink: async () => {
         // Get the state of the application that matters
         const state = get();
-        const url = new URL(window.location.href);
-        url.searchParams.set('variables', JSON.stringify(state.variables));
-        url.searchParams.set('formulas', JSON.stringify(state.formulas));
-        url.searchParams.set('notes', JSON.stringify(state.notes));
-        // Push it to clipboard and set it as the current URL
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(url.toString()).then(
-            function () {
-              window.location.replace(url);
-            },
-            function (err) {
-              window.location.replace(url);
-            },
-          );
+        // Send it off to our API to be added or return the existing url for us
+        const { data } = await axios.post('/api/tinyurl', {
+          state: { ...state, grapher: null },
+        });
+        // Create our new url based on the response data
+        if (!data.err) {
+          const url = new URL(window.location.href);
+          url.pathname = data.url;
+          // Push it to clipboard and set it as the current URL
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(url.toString()).then(
+              function () {
+                window.location.replace(url);
+              },
+              function (err) {
+                window.location.replace(url);
+              },
+            );
+          } else {
+            window.location.replace(url);
+          }
         } else {
-          window.location.replace(url);
+          console.log('Creating link failed!');
         }
       },
       parseUrlFormulas: () => {
@@ -172,7 +181,8 @@ export const useCreateStore = (serverInitialState: InitialState) => {
 
   const isReusingStore = Boolean(store);
   // For CSR, always re-use same store.
-  store = store ?? initializeStore({ ...serverInitialState, grapher: new Grapher() });
+  store =
+    store ?? initializeStore({ ...serverInitialState, grapher: new Grapher() });
   // And if initialState changes, then merge states in the next render cycle.
   //
   // eslint complaining "React Hooks must be called in the exact same order in every component render"
@@ -259,7 +269,7 @@ export interface Actions {
   /**
    * Given the state of the application create a link we can parse into the app state
    */
-  createLink: () => void;
+  createLink: () => Promise<void>;
   /**
    * Get the url and parse the formula in to the app state
    */

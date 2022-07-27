@@ -1,25 +1,23 @@
-import App, { AppContext, AppProps } from "next/app";
-import Head from "next/head";
-import { parseCookies, setCookie } from "nookies";
-import * as React from "react";
+import { AppProps } from 'next/app';
+import Head from 'next/head';
+import { setCookie } from 'nookies';
+import * as React from 'react';
 
-import { extendMath } from "../lib/graphtoy/lib";
-import { Provider, State, useCreateStore } from "../store";
-import { GlobalStyles, PrismA11lyTheme } from "../styles";
-
+import { extendMath } from '../lib/graphtoy/lib';
+import { Provider, State, useCreateStore } from '../store';
+import { GlobalStyles, PrismA11lyTheme } from '../styles';
 
 extendMath();
 
-const MyApp = ({
-  Component,
-  pageProps,
-}: AppProps & { state: State }) => {
-  const createStore = useCreateStore(pageProps);
-  createStore().subscribe((state)=> {
-    // On every state change store state in cookies
-    const stateNew = JSON.stringify({... state, grapher: null });
-    setCookie(null, 'graphtoy-plus', stateNew);
-  })
+const MyApp = ({ Component, pageProps }: AppProps & { state: State }) => {
+  const createStore = useCreateStore(pageProps.initialZustandState);
+  React.useEffect(() => {
+    createStore().subscribe((state) => {
+      // On every state change store state in cookies
+      const stateNew = JSON.stringify({ ...state, grapher: null });
+      setCookie(null, 'graphtoy-plus', stateNew);
+    });
+  }, [createStore]);
   return (
     <Provider createStore={createStore}>
       <GlobalStyles />
@@ -39,17 +37,6 @@ const MyApp = ({
       <Component {...pageProps} />
     </Provider>
   );
-};
-
-MyApp.getInitialProps = async (appContext: AppContext) => {
-  // calls page's `getInitialProps` and fills `appProps.pageProps`
-  const appProps = await App.getInitialProps(appContext);
-  const cookies = parseCookies(appContext.ctx);
-  if ('graphtoy-plus' in cookies){
-    const state = JSON.parse(cookies['graphtoy-plus']);
-    return { ...appProps, pageProps: state };
-  }
-  return {...appProps}
 };
 
 export default MyApp;

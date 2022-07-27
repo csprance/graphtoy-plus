@@ -3,6 +3,7 @@
   "version": "0.6.1",
   "private": true,
   "dependencies": {
+    "@prisma/client": "^4.1.0",
     "axios": "^0.27.2",
     "http-status": "^1.5.2",
     "immer": "^9.0.15",
@@ -10,14 +11,11 @@
     "next": "latest",
     "nookies": "^2.5.2",
     "object-hash": "^3.0.0",
-    "pg": "^8.7.3",
     "prismjs": "^1.28.0",
     "react": "latest",
     "react-dom": "latest",
     "react-simple-code-editor": "^0.11.2",
-    "reflect-metadata": "^0.1.13",
     "styled-components": "^5.3.5",
-    "typeorm": "^0.3.7",
     "zustand": "^4.0.0-rc.4"
   },
   "scripts": {
@@ -25,6 +23,8 @@
     "lint": "next lint",
     "prettier": "prettier --write \"**/*.{ts,tsx}\" ",
     "start": "next start",
+    "prisma-pull-db": "prisma db pull",
+    "prisma:generate": "prisma generate",
     "build-start": "next build && next start",
     "build": "next build"
   },
@@ -40,6 +40,7 @@
     "eslint": "^8.20.0",
     "eslint-config-next": "12.2.3",
     "prettier": "latest",
+    "prisma": "^4.1.0",
     "typescript": "^4.7.4"
   }
 }

@@ -11,13 +11,6 @@ const SliderInput = styled.input`
   outline: none; /* Remove outline */
   opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
   transition: opacity 0.2s;
-  background: linear-gradient(
-    to right,
-    #82cfd0 0%,
-    #82cfd0 50%,
-    #fff 50%,
-    #fff 100%
-  );
   transition: background 450ms ease-in;
   -webkit-appearance: none;
   :hover {

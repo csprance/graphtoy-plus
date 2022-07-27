@@ -8,15 +8,35 @@ services:
       context: .
     networks:
       - web
+      - internal
     environment:
       NODE_ENV: 'production'
     labels:
       traefik.docker.network: 'web'
       traefik.enable: 'true'
       traefik.backend: 'graphtoy-plus'
-      traefik.frontend.rule: 'Host:graphtoy-plus.csprance.com,www.graphtoy-plus.csprance.com'
       traefik.port: '3000'
 
+  postgres:
+    image: postgres:14.1-alpine
+    container_name: gtp-postgres
+    restart: always
+    networks:
+      - internal
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - gtdb:/var/lib/postgresql/data
+
+
+volumes:
+  gtdb:
+    external: true
+
+
 networks:
+  internal:
   web:
     external: true

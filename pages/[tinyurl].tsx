@@ -24,6 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       url: tinyurl,
     },
   });
+  prisma.$disconnect()
   // No Results
   if (!results) {
     return { props: {} };

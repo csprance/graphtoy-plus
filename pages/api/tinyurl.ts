@@ -46,7 +46,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         hits: 0,
       },
     });
-
+    prisma.$disconnect()
     return res.status(httpStatus.OK).send({ ...tinyurl });
   }
 

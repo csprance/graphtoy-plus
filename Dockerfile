@@ -9,9 +9,9 @@ COPY . .
 
 EXPOSE 3000
 
-# deploy prisma migrate/generate
-RUN yarn prisma:deploy
 # build and start
 RUN yarn build
+# deploy prisma migrate/generate
+RUN yarn prisma:deploy
 # start
 CMD npm run start

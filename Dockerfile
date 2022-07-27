@@ -12,6 +12,7 @@ EXPOSE 3000
 # build and start
 RUN yarn build
 # deploy prisma migrate/generate
+RUN yarn prisma:generate
 RUN yarn prisma:deploy
 # start
 CMD npm run start

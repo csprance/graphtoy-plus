@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  postgres:
+    ports:
+      - '5432:5432'
+
+  graphtoy-plus:
+    labels:
+      traefik.frontend.rule: 'Host:graphtoy-plus.csprance.localhost,www.graphtoy-plus.csprance.localhost'

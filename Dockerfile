@@ -1,4 +1,4 @@
-FROM node:17
+FROM node:lts
 
 # install the application
 RUN mkdir /app
@@ -10,5 +10,8 @@ COPY . .
 EXPOSE 3000
 
 # build and start
-RUN npm run build
-CMD npm run serve
+RUN yarn build
+# prisma generate
+RUN yarn prisma:generate
+# start
+CMD npm run start

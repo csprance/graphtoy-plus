@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  graphtoy-plus:
+    labels:
+      traefik.frontend.rule: 'Host:graphtoy-plus.csprance.com,www.graphtoy-plus.csprance.com'
+

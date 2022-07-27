@@ -2,6 +2,8 @@ version: '3'
 
 services:
   graphtoy-plus:
+    depends_on:
+      - postgres
     restart: always
     container_name: graphtoy-plus
     build:

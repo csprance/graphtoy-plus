@@ -10,9 +10,9 @@ interface Props {}
 const Gui: React.FC<Props> = () => {
   return (
     <>
-      <Variables />
-      <br />
       <Formulas />
+      <br />
+      <Variables />
       <br />
       <Notes />
       <br />

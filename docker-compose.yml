@@ -31,6 +31,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - gtdb:/var/lib/postgresql/data
+      - ./prisma/migrations/20220727171020_init/migration.sql:/docker-entrypoint-initdb.d/create_tables.sql
 
 
 volumes:

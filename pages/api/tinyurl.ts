@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import httpStatus from 'http-status';
 import { NextApiRequest, NextApiResponse } from 'next';
 import hash from 'object-hash';
 
+import { prisma } from '../../lib/prisma';
 import { createUniqueRandomKey } from '../../lib/utils';
 
 /**
@@ -27,7 +27,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Add the new item
   if (method === 'POST') {
     const hashedJSON = hash({ ...state, grapher: null });
-    const prisma = new PrismaClient();
     // If we have an url that exists already with the same hash return that instead
     const existingTinyUrl = await prisma.tiny_url.findFirst({
       where: { hash: hashedJSON },
@@ -45,7 +44,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         hits: 0,
       },
     });
-    prisma.$disconnect();
     return res.status(httpStatus.OK).send({ ...tinyurl });
   }
 

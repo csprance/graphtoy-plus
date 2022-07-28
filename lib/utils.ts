@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+
 import { Formula } from './graphtoy/types';
 
 export function isNumber(s: string) {

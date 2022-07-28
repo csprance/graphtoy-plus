@@ -1,6 +1,6 @@
+import { PrismaClient } from '@prisma/client';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import React from 'react';
-import { PrismaClient } from '@prisma/client';
 
 import Graph from '../components/Graph';
 import Gui from '../components/Gui';
@@ -24,11 +24,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       url: tinyurl,
     },
   });
-  prisma.$disconnect()
   // No Results
   if (!results) {
     return { props: {} };
   }
+  prisma.tiny_url
+    .update({
+      where: { id: results.id },
+      data: { hits: results.hits + 1 },
+    })
+    .then(() => {
+      prisma.$disconnect();
+    });
   // Return results
   return {
     props: { initialZustandState: results.value },

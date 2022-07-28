@@ -18,11 +18,7 @@ class MyDocument extends Document {
           <meta charSet="utf-8" />
           <meta name="description" content={SITE_DESCRIPTION} />
           <meta name="author" content={SITE_AUTHOR} />
-          <link
-            rel="shortcut icon"
-            href="/favicon.ico"
-            type="image/x-icon"
-          />
+          <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
           <link rel="icon" href="/favicon.ico" type="image/x-icon" />
           {/* PWA primary color */}
           <meta property="og:type" content="website" />

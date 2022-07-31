@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { setCookie } from 'nookies';
 import * as React from 'react';
 
+import { TooltipStyles } from '../components/Tooltip/tooltip-styles';
 import { extendMath } from '../lib/graphtoy/lib';
 import { Provider, State, useCreateStore } from '../store';
 import { GlobalStyles, PrismA11lyTheme } from '../styles';
@@ -22,6 +23,7 @@ const MyApp = ({ Component, pageProps }: AppProps & { state: State }) => {
     <Provider createStore={createStore}>
       <GlobalStyles />
       <PrismA11lyTheme />
+      <TooltipStyles />
       <Head>
         <title>GraphToy +</title>
         <meta

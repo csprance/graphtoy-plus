@@ -2,6 +2,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import packageJSON from '../package.json';
+import { useStore } from '../store';
+import SEO, { SITE_DESCRIPTION } from './SEO';
 
 const Wrapper = styled.div``;
 const Title = styled.h1`
@@ -16,10 +18,14 @@ const BubbleLink = styled.a`
   margin-left: 5px;
   margin-right: 5px;
 `;
+
 interface Props {}
 const Header: React.FC<Props> = () => {
+  const { notes } = useStore();
+
   return (
     <Wrapper>
+      <SEO article metaDescription={notes ? notes : SITE_DESCRIPTION} />
       <Title>
         Graphtoy<span style={{ color: 'skyblue' }}>+</span> v
         {packageJSON.version}

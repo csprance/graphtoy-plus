@@ -1,12 +1,12 @@
 import * as React from 'react';
 
 import { useStore } from '../store';
-import Grapher from './Grapher';
+import GrapherComponent from './GrapherComponent';
 import TimelineControls from './TimelineControls';
 
 interface Props {}
 const Graph: React.FC<Props> = () => {
-  const { grapher } = useStore();
+  const { grapher, formulas, variables } = useStore();
 
   const [theme, setTheme] = React.useState('Dark');
   const [range, setRange] = React.useState('Free');
@@ -87,7 +87,11 @@ Zoom: Mouse Wheel, or Shift+Left Mouse Button"
         </div>
       </div>
 
-      <Grapher />
+      <GrapherComponent
+        formulas={formulas}
+        variables={variables}
+        grapher={grapher}
+      />
 
       <TimelineControls />
     </div>

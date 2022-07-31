@@ -9,7 +9,6 @@ import {
   lightTheme,
   symbolSubs,
 } from './constants';
-import { extendMath } from './lib';
 import {
   FncFormula,
   Formula,

@@ -11,13 +11,9 @@ const Gui: React.FC<Props> = () => {
   return (
     <>
       <Formulas />
-      <br />
       <Variables />
-      <br />
       <Notes />
-      <br />
       <FunctionButtons />
-      <br />
       <Help />
     </>
   );

@@ -1,10 +1,20 @@
 import * as React from 'react';
 
-import { useStore } from '../store';
+import Grapher from '../lib/graphtoy';
+import { Formula, Variable } from '../lib/graphtoy/types';
 
-interface Props {}
-const Grapher: React.FC<Props> = () => {
-  const { grapher, formulas, variables } = useStore();
+interface Props {
+  grapher: Grapher;
+  formulas: Formula[];
+  variables: Variable[];
+  extraInit?: (grapher: Grapher) => void;
+}
+const GrapherComponent: React.FC<Props> = ({
+  grapher,
+  formulas,
+  variables,
+  extraInit,
+}) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   // Update Canvas
@@ -12,10 +22,12 @@ const Grapher: React.FC<Props> = () => {
     if (canvasRef.current) {
       // Set the canvas so it knows where to operate
       grapher.setCanvas(canvasRef.current);
+      // Do any extra setup you want here
+      if (extraInit) extraInit(grapher);
       // Start grapher and register all the event handles/state
       grapher.start();
     }
-  }, [grapher, canvasRef]);
+  }, [grapher, canvasRef, extraInit]);
 
   // Update Formulas
   React.useEffect(() => {
@@ -30,7 +42,6 @@ const Grapher: React.FC<Props> = () => {
   return (
     <canvas
       ref={canvasRef}
-      id="mainCanvas"
       style={{ width: '100%', height: 'auto' }}
       width={1664}
       height={1248}
@@ -38,4 +49,4 @@ const Grapher: React.FC<Props> = () => {
   );
 };
 
-export default Grapher;
+export default GrapherComponent;

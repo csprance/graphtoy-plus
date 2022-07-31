@@ -16,11 +16,10 @@ class MyDocument extends Document {
       <Html lang="en" dir="ltr">
         <Head>
           <meta charSet="utf-8" />
-          <meta name="description" content={SITE_DESCRIPTION} />
-          <meta name="author" content={SITE_AUTHOR} />
           <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
           <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-          {/* PWA primary color */}
+          <meta name="description" content={SITE_DESCRIPTION} />
+          <meta name="author" content={SITE_AUTHOR} />
           <meta property="og:type" content="website" />
           <meta property="og:site_name" content={SITE_NAME} />
           <meta property="og:title" content={SITE_TITLE} />

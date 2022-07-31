@@ -1,9 +1,11 @@
 import * as React from 'react';
 
+import GuiWindow from './GuiWindow';
+
 interface Props {}
 const Help: React.FC<Props> = () => {
   return (
-    <div className="guiWindow">
+    <GuiWindow>
       <ul>
         <li>Use Mouse to pan view</li>
         <li>Use SHIFT+Mouse to zoom centered at the mouse pointer</li>
@@ -21,7 +23,7 @@ const Help: React.FC<Props> = () => {
           the X axis.
         </li>
       </ul>
-    </div>
+    </GuiWindow>
   );
 };
 

@@ -199,6 +199,9 @@ export const useCreateStore = (serverInitialState: InitialState) => {
           ...store.getState(),
           // but reset all other properties.
           ...serverInitialState,
+          // Always create a new grapher instance
+          // since we set it to null to store in cookies
+          grapher: new Grapher(),
         },
         true, // replace states, rather than shallow merging
       );

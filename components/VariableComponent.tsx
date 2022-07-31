@@ -9,7 +9,7 @@ import RangeSlider from './RangeSlider';
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-columns: 35px 80px auto 70px 70px;
+  grid-template-columns: 35px 80px auto 70px 70px 70px;
   align-items: center;
   margin-bottom: 5px;
 `;
@@ -83,6 +83,21 @@ const VariableComponent: React.FC<Props> = ({
         type="text"
         value={max}
         onChange={setVariableOnChange('max')}
+      />
+
+      <label
+        className={'sr-only'}
+        htmlFor={`step-value-input-for-variable-${name}`}
+      >
+        Step Value input for Variable {name}
+      </label>
+      <input
+        id={`step-value-input-for-variable-${name}`}
+        className={'userInput'}
+        style={{ height: 20, marginLeft: 5, marginRight: 5 }}
+        type="text"
+        value={step}
+        onChange={setVariableOnChange('step')}
       />
     </Wrapper>
   );

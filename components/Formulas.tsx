@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { useStore } from '../store';
 import FormulaComponent from './Formula';
+import GuiWindow from './GuiWindow';
 
 interface Props {}
 const Formulas: React.FC<Props> = () => {
@@ -15,7 +16,7 @@ const Formulas: React.FC<Props> = () => {
   } = useStore();
 
   return (
-    <div className="guiWindow">
+    <GuiWindow>
       <div id="formulaButtonBar">
         <div
           className="userInputButtonsSmall"
@@ -61,7 +62,7 @@ const Formulas: React.FC<Props> = () => {
       {formulas.map((formula) => (
         <FormulaComponent key={formula.id} formula={formula} />
       ))}
-    </div>
+    </GuiWindow>
   );
 };
 

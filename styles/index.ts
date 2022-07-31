@@ -8,7 +8,9 @@ export const ctrlColorHover = '#b08010';
 export const red = '#ec0909';
 export const green = '#2cd863';
 export const blue = '#1dadef';
-export const bgColor = '#404040';
+export const mainBgColor = '#202020';
+export const guiBgColor = '#404040';
+export const fontColor = '#fff';
 
 export const GlobalStyles = createGlobalStyle`
   :root {

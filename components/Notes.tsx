@@ -5,15 +5,9 @@ import Editor from 'react-simple-code-editor';
 import styled from 'styled-components';
 
 import { useStore } from '../store';
-import { bgColor, ctrlColor, inputBg } from '../styles';
+import { ctrlColor, inputBg } from '../styles';
+import GuiWindow from './GuiWindow';
 
-const Wrapper = styled.div`
-  background: ${bgColor};
-  display: grid;
-  padding: 10px;
-  grid-template-rows: 30px auto;
-  border-radius: 5px;
-`;
 const CustomTextArea = styled(Editor)`
   border-radius: 5px;
   background: ${inputBg};
@@ -27,12 +21,13 @@ interface Props {}
 const Notes: React.FC<Props> = () => {
   const { notes, setNotes } = useStore();
   return (
-    <Wrapper>
+    <GuiWindow>
       <p
         style={{
           fontSize: '17.5px',
           padding: 0,
           margin: 0,
+          marginBottom: '10px',
           width: '100%',
           textAlign: 'center',
         }}
@@ -56,7 +51,7 @@ const Notes: React.FC<Props> = () => {
           fontSize: 12,
         }}
       />
-    </Wrapper>
+    </GuiWindow>
   );
 };
 

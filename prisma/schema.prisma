@@ -8,10 +8,11 @@ datasource db {
 }
 
 model tiny_url {
-  id       Int    @id(map: "PK_4bcfe746dc3ce856f454336107f") @default(autoincrement())
-  url      String
-  hash     String
-  value    Json
-  adminUrl String
-  hits     Int
+  id        Int      @id(map: "PK_4bcfe746dc3ce856f454336107f") @default(autoincrement())
+  url       String
+  hash      String
+  value     Json
+  adminUrl  String
+  hits      Int
+  createdAt DateTime @default(now())
 }

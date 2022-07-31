@@ -5,6 +5,7 @@ import hash from 'object-hash';
 import { prisma } from '../../lib/prisma';
 import { createUniqueRandomKey } from '../../lib/utils';
 
+// TODO: Rate limit
 /**
  * This is an API Route located at /api/tinyurl
  * It generates new urls for us given some state or returns an existing one

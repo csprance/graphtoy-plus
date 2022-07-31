@@ -17,15 +17,16 @@ const StyledButton = styled.button`
   }
   width: 72px;
   height: 40px;
-  margin-left: 4px;
+  margin: 4px;
 `;
 interface Props extends React.PropsWithChildren {
   onClick: () => void;
   name: string;
+  style?: React.CSSProperties;
 }
-const Button: React.FC<Props> = ({ children, onClick, name }) => {
+const Button: React.FC<Props> = ({ children, onClick, name, style }) => {
   return (
-    <StyledButton aria-label={name} onClick={onClick}>
+    <StyledButton style={style} aria-label={name} onClick={onClick}>
       {children}
     </StyledButton>
   );

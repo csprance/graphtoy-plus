@@ -471,7 +471,7 @@ export default class Grapher {
       (ev) => {
         this.iMouseWheel(ev);
       },
-      { passive: true },
+      { passive: false },
     );
 
     this.mCanvas.addEventListener(
@@ -606,6 +606,7 @@ export default class Grapher {
   }
 
   private iMouseWheel(e: WheelEvent) {
+    e.preventDefault();
     const sFactor = 1.1;
     const scale = e.deltaY < 0 ? 1.0 / sFactor : sFactor;
     this.mRa = this.mRa * scale;

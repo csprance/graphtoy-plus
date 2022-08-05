@@ -4,11 +4,12 @@ import * as React from 'react';
 import GrapherComponentList from '../components/GrapherComponentList';
 import { prisma } from '../lib/prisma';
 import { tiny_url } from '.prisma/client';
+import Header from "../components/Header";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // Get the latest 10 Graphs
   const latest = await prisma.tiny_url.findMany({
-    orderBy: { createdAt: 'asc' },
+    orderBy: { createdAt: 'desc' },
     take: 10,
   });
   // Get the top 10 Most popular Graphs
@@ -33,12 +34,15 @@ function Browse({
   popular,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
+    <>
+      <Header />
     <div>
-      <h3>Popular</h3>
+      <h2>Popular</h2>
       <GrapherComponentList grapherList={popular} />
-      <h3>Latest</h3>
+      <h2>Latest</h2>
       <GrapherComponentList grapherList={latest} />
     </div>
+      </>
   );
 }
 

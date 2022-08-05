@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { FUNCS } from '../lib/graphtoy/constants';
 import Button from './Button';
+import FunctionDescription from './FunctionDescription';
 import GuiWindow from './GuiWindow';
 import Tooltip from './Tooltip';
 
@@ -34,7 +35,18 @@ const FunctionButtons: React.FC<Props> = () => {
           <Wrapper key={`${idx1}`}>
             {Object.entries(funcs).map(
               ([key, { description, text, params }]) => (
-                <Tooltip content={description} direction="top" key={key}>
+                <Tooltip
+                  content={
+                    <FunctionDescription
+                      name={key}
+                      description={description}
+                      text={text}
+                      params={params}
+                    />
+                  }
+                  direction="right"
+                  key={key}
+                >
                   <Button
                     style={{ minWidth: '100%', height: '30px', margin: 0 }}
                     name={key}

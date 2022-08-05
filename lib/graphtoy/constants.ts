@@ -104,11 +104,11 @@ export const lightTheme: GrapherTheme = {
 export interface FunctionParam {
   name: string;
   valueType: string;
-  description: string;
+  description: string | string[];
 }
 export interface FunctionData {
   text: string;
-  description: string;
+  description: string | string[];
   params: FunctionParam[];
 }
 
@@ -153,8 +153,25 @@ export const FUNCS: Record<string, FunctionData>[] = [
     },
     'fma(x,y,z)': {
       text: 'fma(',
-      description: '',
-      params: [],
+      description:
+        'Multiply-add Returns x*y+z. The function computes the result without losing precision in any intermediate result.',
+      params: [
+        {
+          name: 'x',
+          description: 'The value to multiply',
+          valueType: 'number',
+        },
+        {
+          name: 'y',
+          description: 'The value to multiply',
+          valueType: 'number',
+        },
+        {
+          name: 'z',
+          description: 'The value to add.',
+          valueType: 'number',
+        },
+      ],
     },
     '%': {
       text: '%',
@@ -192,78 +209,147 @@ export const FUNCS: Record<string, FunctionData>[] = [
     },
     'pow(x,y)': {
       text: 'pow(',
-      description: 'Function Exponentiation',
+      description: 'Returns x to the power y.',
       params: [
-        { name: 'x', description: '', valueType: 'number' },
-        { name: 'y', description: '', valueType: 'number' },
+        { name: 'x', description: 'A base value.', valueType: 'number' },
+        {
+          name: 'y',
+          description: 'The power to raise the base.',
+          valueType: 'number',
+        },
       ],
     },
     'exp(x)': {
       text: 'exp(',
-      description: 'Exponentiation',
+      description:
+        'Natural exponential function. EXP(x) returns the natural exponential of x.',
       params: [{ name: 'x', description: '', valueType: 'number' }],
     },
     'exp2(x)': {
       text: 'exp2(',
-      description: 'Exponentiation',
+      description:
+        'Returns the base-2 exponential function of x, which is 2 raised to the power x: 2x.',
       params: [{ name: 'x', description: '', valueType: 'number' }],
     },
     'exp10(x)': {
       text: 'exp10(',
-      description: '',
+      description: 'return the value of 10 raised to the power of x.',
       params: [{ name: 'x', description: '', valueType: 'number' }],
     },
     'log(x)': {
       text: 'log(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the natural logarithm x.',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the natural logarithm.',
+          valueType: 'number',
+        },
+      ],
     },
     'log2(x)': {
       text: 'log2(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the base-2 logarithm x.',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the base-2 logarithm.',
+          valueType: 'number',
+        },
+      ],
     },
     'log10(x)': {
       text: 'log10(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the base-10 logarithm x',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the base-10 logarithm.',
+          valueType: 'number',
+        },
+      ],
     },
   },
   // sqrt/sign
   {
     'sqrt(x)': {
       text: 'sqrt(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the square root of a.',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the square root.',
+          valueType: 'number',
+        },
+      ],
     },
     'cbrt(x)': {
       text: 'cbrt(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the cube root of a number',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar to get the cube root of.',
+          valueType: 'number',
+        },
+      ],
     },
     'rsqrt(x)': {
       text: 'rsqrt(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns an approximation to the reciprocal square root of a.',
+      params: [
+        {
+          name: 'x',
+          description:
+            'scalar of which to determine the reciprocal square root',
+          valueType: 'number',
+        },
+      ],
     },
     'rcbrt(x)': {
       text: 'rcbrt(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the inverse cube-root value of the input.',
+      params: [
+        {
+          name: 'x',
+          description: 'scalar of which to determine the inverse cube root',
+          valueType: 'number',
+        },
+      ],
     },
     'inversesqrt(x)': {
       text: 'inversesqrt(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'return the inverse of the square root of the parameter',
+      params: [
+        {
+          name: 'x',
+          description:
+            'The value of which to take the inverse of the square root.',
+          valueType: 'number',
+        },
+      ],
     },
     'abs(x)': {
       text: 'abs(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the absolute value of a scalar.',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the absolute value.',
+          valueType: 'number',
+        },
+      ],
     },
     'sign(x)': {
       text: 'sign(',
-      description: '',
+      description: [
+        "Returns positive one, zero, or negative one for each of the components of x based on the component's sign.",
+        '1) Returns -1 component if the respective component of x is negative.',
+        '2) Returns 0 component if the respective component of x is zero.',
+        '3) Returns 1 component if the respective component of x is positive.',
+        '4) Ideally, NaN returns NaN.',
+      ],
       params: [{ name: 'x', description: '', valueType: 'number' }],
     },
     'ssign(x)': {
@@ -276,166 +362,323 @@ export const FUNCS: Record<string, FunctionData>[] = [
   {
     'cos(x)': {
       text: 'cos(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the cosine of x in radians. The return value is in the range [-1,+1].',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the cosine.',
+          valueType: 'number',
+        },
+      ],
     },
     'sin(x)': {
       text: 'sin(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the sine of x in radians. The return value is in the range [-1,+1].',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the sine.',
+          valueType: 'number',
+        },
+      ],
     },
     'tan(x)': {
       text: 'tan(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the tangent of x in radians.',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the tangent.',
+          valueType: 'number',
+        },
+      ],
     },
     'acos(x)': {
       text: 'acos(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the arccosine of x in the range [0,pi], expecting x to be in the range [-1,+1].',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the arccosine.',
+          valueType: 'number',
+        },
+      ],
     },
     'asin(x)': {
       text: 'asin(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the arcsine of a in the range [-pi/2,+pi/2], expecting a to be in the range [-1,+1].',
+      params: [
+        {
+          name: 'x',
+          description: 'Scalar of which to determine the arcsine.',
+          valueType: 'number',
+        },
+      ],
     },
     'atan(x)': {
       text: 'atan(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
-    },
-    'atan2(x,y)': {
-      text: 'atan2(',
-      description: '',
+      description:
+        'Returns the arctangent of x in the range of -pi/2 to pi/2 radians.',
       params: [
-        { name: 'x', description: '', valueType: 'number' },
-        { name: 'y', description: '', valueType: 'number' },
+        {
+          name: 'x',
+          description: 'scalar of which to determine the arctangent.',
+          valueType: 'number',
+        },
+      ],
+    },
+    'atan2(y, x)': {
+      text: 'atan2(',
+      description:
+        'atan2 calculates the arctangent of y/x. atan2 is well defined for every point other than the origin, even if x equals 0 and y does not equal 0.',
+      params: [
+        {
+          name: 'x',
+          description:
+            'Scalar for numerator of ratio of which to determine the arctangent.',
+          valueType: 'number',
+        },
+        {
+          name: 'y',
+          description:
+            'Scalar of denominator of ratio of which to determine the arctangent.',
+          valueType: 'number',
+        },
       ],
     },
     'radians(x)': {
       text: 'radians(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Convert a value to radians from degrees',
+      params: [
+        { name: 'x', description: 'A value in degrees', valueType: 'number' },
+      ],
     },
     'degrees(x)': {
       text: 'degrees(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Convert a value to degrees from radians',
+      params: [
+        { name: 'x', description: 'A value in radians', valueType: 'number' },
+      ],
     },
   },
   // sinh/cosh/tanh
   {
     'cosh(x)': {
       text: 'cosh(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the hyperbolic cosine of a.',
+      params: [
+        {
+          name: 'x',
+          description: 'The specified value, in radians.',
+          valueType: 'number',
+        },
+      ],
     },
     'sinh(x)': {
       text: 'sinh(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the hyperbolic sine of x.',
+      params: [
+        {
+          name: 'x',
+          description: 'The specified value, in radians.',
+          valueType: 'number',
+        },
+      ],
     },
     'tanh(x)': {
       text: 'tanh(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the hyperbolic tangent of x.',
+      params: [
+        {
+          name: 'x',
+          description: 'The specified value, in radians.',
+          valueType: 'number',
+        },
+      ],
     },
     'acosh(x)': {
       text: 'acosh(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the hyperbolic arccosine of x.',
+      params: [
+        {
+          name: 'x',
+          description: 'The specified value, in radians.',
+          valueType: 'number',
+        },
+      ],
     },
     'asinh(x)': {
       text: 'asinh(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the hyperbolic arcsine of x.',
+      params: [
+        {
+          name: 'x',
+          description: 'The specified value, in radians.',
+          valueType: 'number',
+        },
+      ],
     },
     'atanh(x)': {
       text: 'atanh(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the hyperbolic arctangent of x.',
+      params: [
+        {
+          name: 'x',
+          description: 'The specified value, in radians.',
+          valueType: 'number',
+        },
+      ],
     },
   },
   // frac/ceil
   {
     'ceil(x)': {
       text: 'ceil(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the ceiling or smallest integer not less than a scalar',
+      params: [
+        {
+          name: 'x',
+          description: 'Value to get the ceil of',
+          valueType: 'number',
+        },
+      ],
     },
     'floor(x)': {
       text: 'floor(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the floor or largest integer not greater than a scalar ',
+      params: [
+        { name: 'x', description: 'Value to floor', valueType: 'number' },
+      ],
     },
     'trunc(x)': {
       text: 'trunc(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description:
+        'Returns the integral value nearest to but no larger in magnitude than x.\n',
+      params: [
+        { name: 'x', description: 'Value to truncate', valueType: 'number' },
+      ],
     },
     'round(x)': {
       text: 'round(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the rounded value of a scalar',
+      params: [
+        { name: 'x', description: 'Value to round', valueType: 'number' },
+      ],
     },
     'frac(x)': {
       text: 'frac(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the fractional portion of a scalar.',
+      params: [
+        {
+          name: 'x',
+          description: 'Value to return the fractional portion of',
+          valueType: 'number',
+        },
+      ],
     },
     'fract(x)': {
       text: 'fract(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: 'Returns the fractional portion of a scalar.',
+      params: [
+        {
+          name: 'x',
+          description: 'Value to return the fractional portion of',
+          valueType: 'number',
+        },
+      ],
     },
   },
   // clamps
   {
     'min(x,y)': {
       text: 'min(',
-      description: '',
+      description: 'The x or y parameter, whichever is the smallest value.',
       params: [
-        { name: 'x', description: '', valueType: 'number' },
-        { name: 'y', description: '', valueType: 'number' },
+        { name: 'x', description: 'The x input value.', valueType: 'number' },
+        { name: 'y', description: 'The y input value.', valueType: 'number' },
       ],
     },
     'max(x,y)': {
       text: 'max(',
-      description: '',
+      description: 'The x or y parameter, whichever is the largest value.',
       params: [
-        { name: 'x', description: '', valueType: 'number' },
-        { name: 'y', description: '', valueType: 'number' },
+        {
+          name: 'x',
+          description: 'The x input value.',
+          valueType: 'number',
+        },
+        { name: 'y', description: 'The y input value.', valueType: 'number' },
       ],
     },
     'saturate(x)': {
       text: 'saturate(',
-      description: '',
-      params: [{ name: 'x', description: '', valueType: 'number' }],
+      description: [
+        'Returns x saturated to the range [0,1] as follows:',
+        '1) Returns 0 if x is less than 0; else\n',
+        '2) Returns 1 if x is greater than 1; else\n',
+        '3) Returns x otherwise.',
+      ],
+      params: [
+        { name: 'x', description: 'A value to saturate', valueType: 'number' },
+      ],
     },
     'clamp(x,c,d)': {
       text: 'clamp(',
-      description: '',
+      description: [
+        'Returns x clamped to the range [a,b] as follows:',
+        '1) Returns a if x is less than a; else',
+        '2) Returns b if x is greater than b; else',
+        '3) Returns x otherwise.',
+      ],
       params: [
-        { name: 'x', description: '', valueType: 'number' },
-        { name: 'c', description: '', valueType: 'number' },
-        { name: 'd', description: '', valueType: 'number' },
+        { name: 'x', description: 'The value to clamp', valueType: 'number' },
+        { name: 'c', description: 'The min value', valueType: 'number' },
+        { name: 'd', description: 'The max value', valueType: 'number' },
       ],
     },
-    'step(a,x)': {
+    'step(y,x)': {
       text: 'step(',
-      description: '',
+      description:
+        'Compares two values, returning 0 or 1 based on which value is greater. (x >= y) ? 1 : 0',
       params: [
-        { name: 'a', description: '', valueType: 'number' },
-        { name: 'x', description: '', valueType: 'number' },
+        {
+          name: 'y',
+          description: 'The first value to compare',
+          valueType: 'number',
+        },
+        {
+          name: 'x',
+          description: 'The second value to compare',
+          valueType: 'number',
+        },
       ],
     },
     'smoothstep(a,b,x)': {
       text: 'smoothstep(',
-      description: '',
+      description:
+        'Returns a smooth Hermite interpolation between 0 and 1, if x is in the range [min, max].\n',
       params: [
-        { name: 'a', description: '', valueType: 'number' },
-        { name: 'b', description: '', valueType: 'number' },
-        { name: 'x', description: '', valueType: 'number' },
+        {
+          name: 'a',
+          description: 'The minimum range of the x parameter.',
+          valueType: 'number',
+        },
+        {
+          name: 'b',
+          description: 'The maximum range of the x parameter.',
+          valueType: 'number',
+        },
+        {
+          name: 'x',
+          description: 'The specified value to be interpolated.',
+          valueType: 'number',
+        },
       ],
     },
     'over(x,y)': {
@@ -451,31 +694,49 @@ export const FUNCS: Record<string, FunctionData>[] = [
   {
     'remap(a,b,x,c,d)': {
       text: 'remap(',
-      description: '',
+      description: 'Remap a value from an old range to a new range.',
       params: [
-        { name: 'a', description: '', valueType: 'number' },
-        { name: 'b', description: '', valueType: 'number' },
-        { name: 'x', description: '', valueType: 'number' },
-        { name: 'c', description: '', valueType: 'number' },
-        { name: 'd', description: '', valueType: 'number' },
+        {
+          name: 'a',
+          description: 'The old minimum value.',
+          valueType: 'number',
+        },
+        {
+          name: 'b',
+          description: 'The old maximum value.',
+          valueType: 'number',
+        },
+        { name: 'x', description: 'The value to remap.', valueType: 'number' },
+        { name: 'c', description: 'The new min value.', valueType: 'number' },
+        { name: 'd', description: 'The new max value.', valueType: 'number' },
       ],
     },
     'mix(a,b,x)': {
       text: 'mix(',
-      description: '',
+      description: 'Performs a linear interpolation.',
       params: [
-        { name: 'a', description: '', valueType: 'number' },
-        { name: 'b', description: '', valueType: 'number' },
-        { name: 'x', description: '', valueType: 'number' },
+        { name: 'a', description: 'The first value', valueType: 'number' },
+        { name: 'b', description: 'The second value', valueType: 'number' },
+        {
+          name: 'x',
+          description:
+            'A value that linearly interpolates between the a parameter and the b parameter.',
+          valueType: 'number',
+        },
       ],
     },
     'lerp(a,b,x)': {
       text: 'lerp(',
-      description: '',
+      description: 'Performs a linear interpolation.',
       params: [
-        { name: 'a', description: '', valueType: 'number' },
-        { name: 'b', description: '', valueType: 'number' },
-        { name: 'x', description: '', valueType: 'number' },
+        { name: 'a', description: 'The first value', valueType: 'number' },
+        { name: 'b', description: 'The second value', valueType: 'number' },
+        {
+          name: 'x',
+          description:
+            'A value that linearly interpolates between the a parameter and the b parameter.',
+          valueType: 'number',
+        },
       ],
     },
     'tri(a,x)': {
@@ -514,47 +775,47 @@ export const FUNCS: Record<string, FunctionData>[] = [
   {
     PI: {
       text: 'PI',
-      description: '',
+      description: '3.14159265359',
       params: [],
     },
     E: {
       text: 'E',
-      description: '',
+      description: "Euler's number: 2.71828",
       params: [],
     },
     PHI: {
       text: 'PHI',
-      description: '',
+      description: '1.61803 (AKA The Golden Ratio)',
       params: [],
     },
     LN10: {
       text: 'LN10',
-      description: '',
+      description: '2.3025850929940459 A value that represents the logarithm base e of 10, the natural logarithm of 10.',
       params: [],
     },
     LN2: {
       text: 'LN2',
-      description: '',
+      description: '0.69314718055994529 A value that represents the logarithm base e of 2, the natural logarithm of 2.',
       params: [],
     },
     LOG10E: {
       text: 'LOG10E',
-      description: '',
+      description: '0.43429448190325182 A value that represents the logarithm base 10 of e, the common logarithm of e.',
       params: [],
     },
     LOG2E: {
       text: 'LOG2E',
-      description: '',
+      description: '1.4426950408889634 A value that represents the logarithm base 2 of e, the binary logarithm of e.',
       params: [],
     },
     SQRT2: {
       text: 'SQRT2',
-      description: '',
+      description: '1.4142135623730951 A value that represents √2.',
       params: [],
     },
     SQRT1_2: {
       text: 'SQRT1_2',
-      description: '',
+      description: '0.70710678118654757 Stores a value that represents the following equivalent values: (√2)/2, √(½), and 1/(√2).',
       params: [],
     },
   },

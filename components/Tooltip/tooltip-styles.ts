@@ -30,7 +30,8 @@ export const TooltipStyles = createGlobalStyle`
     font-family: sans-serif;
     line-height: 1;
     z-index: 100;
-    white-space: nowrap;
+    white-space: pre-wrap;
+    min-width: 250px;
   }
 
   /* CSS border triangles */

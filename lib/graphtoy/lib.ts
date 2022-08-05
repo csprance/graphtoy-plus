@@ -121,6 +121,144 @@ export function noise(x: number) {
   const b = (2.0 * cellnoise(i + 1) - 1.0) * (f - 1.0);
   return 2.0 * (a + (b - a) * w);
 }
+// These are all taken from
+// https://easings.net/
+export const c1 = 1.70158;
+export const c2 = c1 * 1.525;
+export const c3 = c1 + 1;
+export const c4 = (2 * Math.PI) / 3;
+export const c5 = (2 * Math.PI) / 4.5;
+export const bounceOut = (x: number) => {
+  const n1 = 7.5625;
+  const d1 = 2.75;
+
+  if (x < 1 / d1) {
+    return n1 * x * x;
+  } else if (x < 2 / d1) {
+    return n1 * (x -= 1.5 / d1) * x + 0.75;
+  } else if (x < 2.5 / d1) {
+    return n1 * (x -= 2.25 / d1) * x + 0.9375;
+  } else {
+    return n1 * (x -= 2.625 / d1) * x + 0.984375;
+  }
+};
+export const linear = (x: number) => x;
+export const easeInQuad = (x: number) => {
+  return x * x;
+};
+export const easeOutQuad = (x: number) => {
+  return 1 - (1 - x) * (1 - x);
+};
+export const easeInOutQuad = (x: number) => {
+  return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+};
+export const easeInCubic = (x: number) => {
+  return x * x * x;
+};
+export const easeOutCubic = (x: number) => {
+  return 1 - Math.pow(1 - x, 3);
+};
+export const easeInOutCubic = (x: number) => {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+};
+export const easeInQuart = (x: number) => {
+  return x * x * x * x;
+};
+export const easeOutQuart = (x: number) => {
+  return 1 - Math.pow(1 - x, 4);
+};
+export const easeInOutQuart = (x: number) => {
+  return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+};
+export const easeInQuint = (x: number) => {
+  return x * x * x * x * x;
+};
+export const easeOutQuint = (x: number) => {
+  return 1 - Math.pow(1 - x, 5);
+};
+export const easeInOutQuint = (x: number) => {
+  return x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
+};
+export const easeInSine = (x: number) => {
+  return 1 - Math.cos((x * Math.PI) / 2);
+};
+export const easeOutSine = (x: number) => {
+  return Math.sin((x * Math.PI) / 2);
+};
+export const easeInOutSine = (x: number) => {
+  return -(Math.cos(Math.PI * x) - 1) / 2;
+};
+export const easeInExpo = (x: number) => {
+  return x === 0 ? 0 : Math.pow(2, 10 * x - 10);
+};
+export const easeOutExpo = (x: number) => {
+  return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+};
+export const easeInOutExpo = (x: number) => {
+  return x === 0
+    ? 0
+    : x === 1
+    ? 1
+    : x < 0.5
+    ? Math.pow(2, 20 * x - 10) / 2
+    : (2 - Math.pow(2, -20 * x + 10)) / 2;
+};
+export const easeInCirc = (x: number) => {
+  return 1 - Math.sqrt(1 - Math.pow(x, 2));
+};
+export const easeOutCirc = (x: number) => {
+  return Math.sqrt(1 - Math.pow(x - 1, 2));
+};
+export const easeInOutCirc = (x: number) => {
+  return x < 0.5
+    ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
+    : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
+};
+export const easeInBack = (x: number) => {
+  return c3 * x * x * x - c1 * x * x;
+};
+export const easeOutBack = (x: number) => {
+  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+};
+export const easeInOutBack = (x: number) => {
+  return x < 0.5
+    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+};
+export const easeInElastic = (x: number) => {
+  return x === 0
+    ? 0
+    : x === 1
+    ? 1
+    : -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * c4);
+};
+export const easeOutElastic = (x: number) => {
+  return x === 0
+    ? 0
+    : x === 1
+    ? 1
+    : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+};
+export const easeInOutElastic = (x: number) => {
+  return x === 0
+    ? 0
+    : x === 1
+    ? 1
+    : x < 0.5
+    ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
+    : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;
+};
+export const easeInBounce = (x: number) => {
+  return 1 - bounceOut(1 - x);
+};
+export const easeOutBounce = (x: number) => {
+  return bounceOut(x);
+};
+export const easeInOutBounce = (x: number) => {
+  return x < 0.5
+    ? (1 - bounceOut(1 - 2 * x)) / 2
+    : (1 + bounceOut(2 * x - 1)) / 2;
+};
 
 /**
  * This is kind of a hacky function in which we override and add a bunch of new methods to the Math object
@@ -157,7 +295,41 @@ export function extendMath() {
     ['cellnoise', cellnoise],
     ['voronoi', voronoi],
     ['noise', noise],
+    ['linear', linear],
+    ['bounceout', bounceOut],
+    ['easeinquad', easeInQuad],
+    ['easeoutquad', easeOutQuad],
+    ['easeinoutquad', easeInOutQuad],
+    ['easeincubic', easeInCubic],
+    ['easeoutcubic', easeOutCubic],
+    ['easeinoutcubic', easeInOutCubic],
+    ['easeinquart', easeInQuart],
+    ['easeoutquart', easeOutQuart],
+    ['easeinoutquart', easeInOutQuart],
+    ['easeinquint', easeInQuint],
+    ['easeoutquint', easeOutQuint],
+    ['easeinoutquint', easeInOutQuint],
+    ['easeinsine', easeInSine],
+    ['easeoutsine', easeOutSine],
+    ['easeinoutsine', easeInOutSine],
+    ['easeinexpo', easeInExpo],
+    ['easeoutexpo', easeOutExpo],
+    ['easeinoutexpo', easeInOutExpo],
+    ['easeincirc', easeInCirc],
+    ['easeoutcirc', easeOutCirc],
+    ['easeinoutcirc', easeInOutCirc],
+    ['easeinback', easeInBack],
+    ['easeoutback', easeOutBack],
+    ['easeinoutback', easeInOutBack],
+    ['easeinelastic', easeInElastic],
+    ['easeoutelastic', easeOutElastic],
+    ['easeinoutelastic', easeInOutElastic],
+    ['easeinbounce', easeInBounce],
+    ['easeoutbounce', easeOutBounce],
+    ['easeinoutbounce', easeInOutBounce],
   ];
+  // Extend basic math
+  // Always use lowercase function names
   funcs.forEach(([name, func]) => {
     // @ts-ignore
     Math[name] = func;

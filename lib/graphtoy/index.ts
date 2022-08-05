@@ -335,6 +335,9 @@ export default class Grapher {
         error: getErrorMessage(err),
         formula,
       });
+      if (process.env.NODE_ENV !== 'production') {
+        console.error(err, fncString);
+      }
       return false;
     }
     try {
@@ -646,9 +649,9 @@ export default class Grapher {
     const g = this.mFormulas.find((f) => f.visualizer[1]);
     const b = this.mFormulas.find((f) => f.visualizer[2]);
     return [
-      r ? this.mFunctionFun[this.mFunctionVisualizer[r.id]] : null,
-      g ? this.mFunctionFun[this.mFunctionVisualizer[g.id]] : null,
-      b ? this.mFunctionFun[this.mFunctionVisualizer[b.id]] : null,
+      r ? this.mFunctionFun[r.id] : null,
+      g ? this.mFunctionFun[g.id] : null,
+      b ? this.mFunctionFun[b.id] : null,
     ];
   }
 }
